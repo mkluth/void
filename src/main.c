@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <ncurses.h>
 
+#define CTRL(c)	((c) & 0x1f)	/* Bit flipping to represent a Ctrl key */
+
 static void void_atexit_handler(void)
 {
 	endwin();	/* End curses mode */
@@ -24,7 +26,7 @@ int main(void)
 	WINDOW *win = void_term_raw();
 	getmaxyx(win, win_y, win_x);
 
-	for (int i = 0, c = 0; (c = getch()) != 'q'; i++) {
+	for (int i = 0, c = 0; (c = getch()) != CTRL('q'); i++) {
 		if (i == win_y) {
 			clear();
 			i = 0;
