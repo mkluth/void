@@ -5,7 +5,8 @@
 #
 # Author: Luth
 
-EXE := lxt
+EXE := void
+LIBS := -lncurses
 INCLUDES := -I./src -I./include
 SRCS := $(shell find ./src -name "*.c")
 
@@ -18,7 +19,7 @@ CFLAGS := -Wall -Wextra $(INCLUDES)
 all: obj $(EXE)
 
 $(EXE): obj
-	$(CC) *.o -o $@
+	$(CC) $(LIBS) *.o -o $@
 	mkdir -p ./obj
 	mv -f *.o ./obj
 
@@ -27,7 +28,7 @@ obj: $(SRCS)
 
 # The build instruction if you run "make debug"
 debug: objdebug
-	$(CC) *.o -g -o $(EXE)
+	$(CC) $(LIBS) *.o -g -o $(EXE)
 	mkdir -p ./obj
 	mv -f *.o ./obj
 
