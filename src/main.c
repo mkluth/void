@@ -6,7 +6,9 @@ int main(void)
 {
 	struct v_state *v = v_new_state();
 	v_scr_raw(v);
-	while (getch() != CTRL('q'));
+	while (v->v_run)
+		v_prcs_key(v);
+
 	v_dstr_state(v);
 
 	return EXIT_SUCCESS;

@@ -20,9 +20,9 @@ struct v_state *v_new_state(void)
 	if (!v->v_scr)
 		goto err;
 
-	v->scr_x = COLS;
-	v->scr_y = LINES;
+	getmaxyx(v->v_scr, v->scr_y, v->scr_x);
 	v->v_mode = V_CMD;
+	v->v_run = V_TRUE;
 
 	return v;
 err:
@@ -51,6 +51,7 @@ int v_dstr_state(struct v_state *v)
 	v->scr_y = 0;
 	v->scr_x = 0;
 	v->v_mode = 0;
+	v->v_run = V_FALSE;
 
 	free(v);
 	v = NULL;
@@ -59,7 +60,7 @@ int v_dstr_state(struct v_state *v)
 }
 
 /*
- * v_scr_raw - Set the NCURSES screen into raw mode
+ * v_scr_raw - Set the curses screen into raw mode
  * v: a pointer to a v_state struct
  *
  * Description:
