@@ -13,14 +13,14 @@
 
 /*
  * struct v_state - current thread information
- * v_scr: pointer to curses WINDOW struct
+ * v_stdscr: pointer to NCURSES stdscr WINDOW struct
  * scr_x: value of screen x-axis
  * scr_y: value of screen y-axis
  * v_mode: current editor mode
  * v_run: editor current running status
  */
 struct v_state {
-	WINDOW *v_scr;
+	WINDOW *v_stdscr;
 	int scr_x;
 	int scr_y;
 	int v_mode;
@@ -30,9 +30,12 @@ struct v_state {
 /* src/state.c */
 struct v_state *v_new_state(void);
 int v_dstr_state(struct v_state *v);
-int v_scr_raw(struct v_state *v);
 
 /* src/input.c */
 int v_prcs_key(struct v_state *v);
+
+/* src/term.c */
+int v_init_term(struct v_state *v);
+int v_reset_term(struct v_state *v);
 
 #endif	/* VOID_H */
