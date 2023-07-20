@@ -3,6 +3,10 @@
 
 #include <ncurses.h>
 
+#define V_VER		"0.0.1"
+#define V_DESC		"A minimal text editor"
+#define V_WC		"void/Void " V_VER " -- " V_DESC
+
 #define V_OK		0		/* Return value success */
 #define V_ERR		1		/* Return value failure */
 #define V_TRUE		1		/* Boolean value for True */
@@ -37,5 +41,8 @@ int v_prcs_key(struct v_state *v);
 /* src/term.c */
 int v_init_term(struct v_state *v);
 int v_reset_term(struct v_state *v);
+
+/* src/output.c */
+int v_rfsh_scr(struct v_state *v);
 
 #endif	/* VOID_H */
