@@ -15,11 +15,18 @@
 #define V_INSERT	2		/* Insert mode value */
 #define CTRL(c)		((c) & 0x1f)	/* Represent a Ctrl key */
 
+#define CUR_LEFT	104		/* Move cursor leftwards */
+#define CUR_UP		107		/* Move cursor upwards */
+#define CUR_DOWN	106		/* Move cursor downwards */
+#define CUR_RIGHT	108		/* Move cursor rightwards */
+
 /*
  * struct v_state - current thread information
  * v_stdscr: pointer to NCURSES stdscr WINDOW struct
  * scr_x: value of screen x-axis
  * scr_y: value of screen y-axis
+ * cur_x: current cursor x-axis
+ * cur_y: current cursor y-axis
  * v_mode: current editor mode
  * v_run: editor current running status
  */
@@ -27,6 +34,8 @@ struct v_state {
 	WINDOW *v_stdscr;
 	int scr_x;
 	int scr_y;
+	int cur_x;
+	int cur_y;
 	int v_mode;
 	int v_run;
 };

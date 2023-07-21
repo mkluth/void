@@ -40,8 +40,10 @@ int v_reset_term(struct v_state *v)
 
 	endwin();
 	v->v_stdscr = NULL;
-	v->scr_y = 0;
 	v->scr_x = 0;
+	v->scr_y = 0;
+	v->cur_x = 0;
+	v->cur_y = 0;
 
 	return V_OK;
 }

@@ -17,8 +17,10 @@ struct v_state *v_new_state(void)
 		return NULL;
 
 	v->v_stdscr = NULL;
-	v->scr_y = 0;
 	v->scr_x = 0;
+	v->scr_y = 0;
+	v->cur_x = 0;
+	v->cur_y = 0;
 	v->v_mode = V_CMD;
 	v->v_run = V_TRUE;
 

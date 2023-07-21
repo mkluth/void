@@ -58,9 +58,9 @@ int v_rfsh_scr(struct v_state *v)
 
 	curs_set(2);
 	v_draw_scr_y(v);
-	move(0, 0);
-	refresh();
+	move(v->cur_y, v->cur_x);
 	curs_set(1);
+	refresh();
 
 	return V_OK;
 }
