@@ -1,6 +1,20 @@
 #include <ncurses.h>
 #include <void.h>
 
+static void v_pg_up(struct v_state *v)
+{
+	int times = v->scr_y;
+	while (times-- && v->cur_y != 0)
+		v->cur_y--;
+}
+
+static void v_pg_down(struct v_state *v)
+{
+	int times = v->scr_y;
+	while (times-- && v->cur_y != v->scr_y - 1)
+		v->cur_y++;
+}
+
 static int v_mv_cur(struct v_state *v, int key)
 {
 	if (!v || !v->v_stdscr || v->cur_x < 0 || v->cur_y < 0)
@@ -9,34 +23,47 @@ static int v_mv_cur(struct v_state *v, int key)
 	switch (key) {
 	case CUR_LEFT:
 	case KEY_LEFT:
-		/* Move the cursor leftwards */
+		/* Move cursor leftwards */
 		if (v->cur_x != 0)
 			v->cur_x--;
-		break;
+		return V_OK;
 	case CUR_RIGHT:
 	case KEY_RIGHT:
-		/* Move the cursor rightwards */
+		/* Move cursor rightwards */
 		if (v->cur_x != v->scr_x - 1)
 			v->cur_x++;
-		break;
+		return V_OK;
 	case CUR_UP:
 	case KEY_UP:
-		/* Move the cursor upwards */
+		/* Move cursor upwards */
 		if (v->cur_y != 0)
 			v->cur_y--;
-		break;
+		return V_OK;
 	case CUR_DOWN:
 	case KEY_DOWN:
-		/* Move the cursor downwards */
+		/* Move cursor downwards */
 		if (v->cur_y != v->scr_y - 1)
 			v->cur_y++;
-		break;
-	default:
-		/* None of the above */
-		return V_ERR;
+		return V_OK;
+	case KEY_HOME:
+		/* Move cursor via Home key */
+		v->cur_x = 0;
+		return V_OK;
+	case KEY_END:
+		/* Move cursor via End key */
+		v->cur_x = v->scr_x - 1;
+		return V_OK;
+	case KEY_PPAGE:
+		/* Move cursor via Page Up */
+		v_pg_up(v);
+		return V_OK;
+	case KEY_NPAGE:
+		/* Move cursor via Page Down */
+		v_pg_down(v);
+		return V_OK;
 	}
 
-	return V_OK;
+	return V_ERR;
 }
 
 /*
