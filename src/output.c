@@ -7,7 +7,19 @@ static int v_draw_y(struct v_state *v, int y)
 	if (!v || !v->v_stdscr || y < 0)
 		return V_ERR;
 
+	if (y < v->nrows) {
+		/* There is a row to be displayed */
+		int len = v->row.len;
+		if (len > v->scr_x)
+			len = v->scr_x;
+
+		addnstr(v->row.cont, len);
+
+		return V_OK;
+	}
+
 	if (y == v->scr_y / 3) {
+		/* Display welcome message */
 		int len = strlen(V_WC);
 		if (len > v->scr_x)
 			len = v->scr_x;
@@ -20,7 +32,8 @@ static int v_draw_y(struct v_state *v, int y)
 
 		while (padding--)
 			printw(" ");
-		printw("%s\n", V_WC);
+
+		addnstr(V_WC, len);
 
 		return V_OK;
 	}

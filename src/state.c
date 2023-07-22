@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stddef.h>
-#include <ncurses.h>
 #include <void.h>
 
 /*
@@ -17,6 +16,9 @@ struct v_state *v_new_state(void)
 		return NULL;
 
 	v->v_stdscr = NULL;
+	v->row.cont = NULL;
+	v->row.len = 0;
+	v->nrows = 0;
 	v->scr_x = 0;
 	v->scr_y = 0;
 	v->cur_x = 0;
@@ -43,6 +45,10 @@ int v_dstr_state(struct v_state *v)
 	if (v->v_stdscr)
 		v_reset_term(v);
 
+	free(v->row.cont);
+	v->row.cont = NULL;
+	v->row.len = 0;
+	v->nrows = 0;
 	v->v_mode = 0;
 	v->v_run = V_FALSE;
 

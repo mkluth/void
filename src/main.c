@@ -1,9 +1,13 @@
 #include <stdlib.h>
 #include <void.h>
 
-int main(void)
+int main(int argc, char **argv)
 {
+	if (argc < 2)
+		return EXIT_FAILURE;
+
 	struct v_state *v = v_new_state();
+	v_open(v, argv[1]);
 	v_init_term(v);
 
 	while (v->v_run) {

@@ -21,8 +21,20 @@
 #define CUR_RIGHT	108		/* Move cursor rightwards */
 
 /*
+ * struct v_row - stores line of text to be displayed
+ * cont: the row content
+ * len: the row length
+ */
+struct v_row {
+	char *cont;
+	int len;
+};
+
+/*
  * struct v_state - current thread information
  * v_stdscr: pointer to NCURSES stdscr WINDOW struct
+ * row: row of text
+ * nrows: number of rows available
  * scr_x: value of screen x-axis
  * scr_y: value of screen y-axis
  * cur_x: current cursor x-axis
@@ -32,6 +44,8 @@
  */
 struct v_state {
 	WINDOW *v_stdscr;
+	struct v_row row;
+	int nrows;
 	int scr_x;
 	int scr_y;
 	int cur_x;
@@ -53,5 +67,8 @@ int v_reset_term(struct v_state *v);
 
 /* src/output.c */
 int v_rfsh_scr(struct v_state *v);
+
+/* src/fileio.c */
+int v_open(struct v_state *v, char *filename);
 
 #endif	/* VOID_H */
