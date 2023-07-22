@@ -18,7 +18,7 @@ static int v_draw_y(struct v_state *v, int y)
 		return V_OK;
 	}
 
-	if (y == v->scr_y / 3) {
+	if (v->nrows == 0 && y == v->scr_y / 3) {
 		/* Display welcome message */
 		int len = strlen(V_WC);
 		if (len > v->scr_x)

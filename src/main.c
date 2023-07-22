@@ -3,12 +3,11 @@
 
 int main(int argc, char **argv)
 {
-	if (argc < 2)
-		return EXIT_FAILURE;
-
 	struct v_state *v = v_new_state();
-	v_open(v, argv[1]);
 	v_init_term(v);
+
+	if (argc >= 2)
+		v_open(v, argv[1]);
 
 	while (v->v_run) {
 		v_rfsh_scr(v);
