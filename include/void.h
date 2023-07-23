@@ -33,7 +33,7 @@ struct v_row {
 /*
  * struct v_state - current thread information
  * v_stdscr: pointer to NCURSES stdscr WINDOW struct
- * row: row of text
+ * rows: an array of v_row structs
  * nrows: number of rows available
  * scr_x: value of screen x-axis
  * scr_y: value of screen y-axis
@@ -44,7 +44,7 @@ struct v_row {
  */
 struct v_state {
 	WINDOW *v_stdscr;
-	struct v_row row;
+	struct v_row *rows;
 	int nrows;
 	int scr_x;
 	int scr_y;
@@ -70,5 +70,9 @@ int v_rfsh_scr(struct v_state *v);
 
 /* src/fileio.c */
 int v_open(struct v_state *v, char *filename);
+
+/* src/row.c */
+int v_append_row(struct v_state *v, char *s, int len);
+int v_free_rows(struct v_state *v);
 
 #endif	/* VOID_H */

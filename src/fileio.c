@@ -27,27 +27,25 @@ int v_open(struct v_state *v, char *filename)
 
 	char *s = NULL;
 	size_t cap = 0;
-	ssize_t len = getline(&s, &cap, fp);
-	if (len == -1) {
-		fclose(fp);
-		return V_ERR;
+	ssize_t len = 0;
+	while ((len = getline(&s, &cap, fp)) != -1) {
+		while (len > 0 && (s[len - 1] == '\n' || s[len - 1] == '\r'))
+			len--;
+		if (v_append_row(v, s, len) == -1)
+			goto error;
 	}
 
-	while (len > 0 && (s[len - 1] == '\n' || s[len - 1] == '\r'))
-		len--;
-
-	v->row.len = len;
-	v->row.cont = malloc(len + 1);
-	if (!v->row.cont)
-		return V_ERR;
-
-	memcpy(v->row.cont, s, len);
-	v->row.cont[len] = '\0';
-	v->nrows = 1;
-
 	fclose(fp);
+	fp = NULL;
 	free(s);
 	s = NULL;
 
 	return V_OK;
+error:
+	fclose(fp);
+	fp = NULL;
+	free(s);
+	s = NULL;
+
+	return V_ERR;
 }

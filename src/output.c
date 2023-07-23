@@ -9,11 +9,12 @@ static int v_draw_y(struct v_state *v, int y)
 
 	if (y < v->nrows) {
 		/* There is a row to be displayed */
-		int len = v->row.len;
+		struct v_row *row = &v->rows[y];
+		int len = row->len;
 		if (len > v->scr_x)
 			len = v->scr_x;
 
-		addnstr(v->row.cont, len);
+		addnstr(row->cont, len);
 
 		return V_OK;
 	}
