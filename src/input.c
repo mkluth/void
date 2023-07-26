@@ -42,7 +42,7 @@ static int v_mv_cur(struct v_state *v, int key)
 	case CUR_DOWN:
 	case KEY_DOWN:
 		/* Move cursor downwards */
-		if (v->cur_y != v->scr_y - 1)
+		if (v->cur_y < v->nrows)
 			v->cur_y++;
 		return V_OK;
 	case KEY_HOME:

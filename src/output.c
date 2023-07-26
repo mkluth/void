@@ -2,14 +2,29 @@
 #include <string.h>
 #include <void.h>
 
+static int v_scroll(struct v_state *v)
+{
+	if (!v || v->cur_y < 0 || v->rowoff < 0 || v->scr_y <= 0)
+		return V_ERR;
+
+	if (v->cur_y < v->rowoff)
+		v->rowoff = v->cur_y;
+
+	if (v->cur_y >= v->rowoff + v->scr_y)
+		v->rowoff = v->cur_y - v->scr_y + 1;
+
+	return V_OK;
+}
+
 static int v_draw_y(struct v_state *v, int y)
 {
 	if (!v || !v->v_stdscr || y < 0)
 		return V_ERR;
 
-	if (y < v->nrows) {
+	int filerow = v->rowoff + y;
+	if (filerow < v->nrows) {
 		/* There is a row to be displayed */
-		struct v_row *row = &v->rows[y];
+		struct v_row *row = &v->rows[filerow];
 		int len = row->len;
 		if (len > v->scr_x)
 			len = v->scr_x;
@@ -70,9 +85,10 @@ int v_rfsh_scr(struct v_state *v)
 	if (!v || !v->v_stdscr)
 		return V_ERR;
 
+	v_scroll(v);
 	curs_set(2);
 	v_draw_scr_y(v);
-	move(v->cur_y, v->cur_x);
+	move(v->cur_y - v->rowoff, v->cur_x);
 	curs_set(1);
 	refresh();
 

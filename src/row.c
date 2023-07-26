@@ -64,6 +64,7 @@ int v_free_rows(struct v_state *v)
 
 	free(v->rows);
 	v->rows = NULL;
+	v->rowoff = 0;
 
 	return V_OK;
 }
