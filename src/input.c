@@ -1,65 +1,68 @@
 #include <ncurses.h>
 #include <void.h>
 
-static void v_pg_up(struct v_state *v)
+static int v_cur(struct v_state *v, int key)
 {
-	int times = v->scr_y;
-	while (times-- && v->cur_y != 0)
-		v->cur_y--;
-}
-
-static void v_pg_down(struct v_state *v)
-{
-	int times = v->scr_y;
-	while (times-- && v->cur_y != v->scr_y - 1)
-		v->cur_y++;
-}
-
-static int v_mv_cur(struct v_state *v, int key)
-{
-	if (!v || !v->v_stdscr || v->cur_x < 0 || v->cur_y < 0)
-		return V_ERR;
-
 	switch (key) {
 	case CUR_LEFT:
-	case KEY_LEFT:
-		/* Move cursor leftwards */
+		/* Cursor left */
 		if (v->cur_x != 0)
 			v->cur_x--;
 		return V_OK;
 	case CUR_RIGHT:
-	case KEY_RIGHT:
-		/* Move cursor rightwards */
+		/* Cursor right */
 		if (v->cur_x != v->scr_x - 1)
 			v->cur_x++;
 		return V_OK;
 	case CUR_UP:
-	case KEY_UP:
-		/* Move cursor upwards */
+		/* Cursor up */
 		if (v->cur_y != 0)
 			v->cur_y--;
 		return V_OK;
 	case CUR_DOWN:
-	case KEY_DOWN:
-		/* Move cursor downwards */
+		/* Cursor down */
 		if (v->cur_y < v->nrows)
 			v->cur_y++;
 		return V_OK;
+	}
+
+	return V_ERR;
+}
+
+static void v_pg(struct v_state *v, int key)
+{
+	int times = v->scr_y;
+	while (times--)
+		v_cur(v, key == KEY_PPAGE ? CUR_UP : CUR_DOWN);
+}
+
+static int v_nav(struct v_state *v, int key)
+{
+	switch (key) {
+	case KEY_LEFT:
+		/* Arrow left */
+		return v_cur(v, CUR_LEFT);
+	case KEY_RIGHT:
+		/* Arrow right */
+		return v_cur(v, CUR_RIGHT);
+	case KEY_UP:
+		/* Arrow up */
+		return v_cur(v, CUR_UP);
+	case KEY_DOWN:
+		/* Arrow down */
+		return v_cur(v, CUR_DOWN);
 	case KEY_HOME:
-		/* Move cursor via Home key */
+		/* Home key */
 		v->cur_x = 0;
 		return V_OK;
 	case KEY_END:
-		/* Move cursor via End key */
+		/* End key */
 		v->cur_x = v->scr_x - 1;
 		return V_OK;
 	case KEY_PPAGE:
-		/* Move cursor via Page Up */
-		v_pg_up(v);
-		return V_OK;
 	case KEY_NPAGE:
-		/* Move cursor via Page Down */
-		v_pg_down(v);
+		/* Page Up and Page Down */
+		v_pg(v, key);
 		return V_OK;
 	}
 
@@ -77,23 +80,21 @@ static int v_mv_cur(struct v_state *v, int key)
  */
 int v_prcs_key(struct v_state *v)
 {
-	if (!v || v->v_mode != V_CMD || !v->v_stdscr)
+	if (!v || v->v_mode != V_CMD || !v->v_stdscr || v->cur_x < 0 ||
+			v->cur_y < 0 || v->scr_x <= 0 || v->scr_y <= 0)
 		return V_ERR;
 
 	int key = getch();
 
-	if (v_mv_cur(v, key) == V_OK)
+	if (v_cur(v, key) == V_OK || v_nav(v, key) == V_OK)
 		return V_OK;
 
 	switch (key) {
 	case CTRL('q'):
 		/* Ctrl-Q: Exit the editor */
 		v->v_run = V_FALSE;
-		break;
-	default:
-		/* None of the above */
-		return V_ERR;
+		return V_OK;
 	}
 
-	return V_OK;
+	return V_ERR;
 }
