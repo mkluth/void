@@ -12,7 +12,7 @@
  * Description:
  * Returns the newly updated number of rows upon successful completion.
  * Otherwise, -1 shall be returned instead. To easily free all the datas
- * associated with v_row, check out v_free_rows().
+ * associated with the v->rows array, check out v_free_rows().
  */
 int v_append_row(struct v_state *v, char *s, int len)
 {
@@ -65,6 +65,7 @@ int v_free_rows(struct v_state *v)
 	free(v->rows);
 	v->rows = NULL;
 	v->rowoff = 0;
+	v->coloff = 0;
 
 	return V_OK;
 }

@@ -40,6 +40,7 @@ struct v_row {
  * cur_x: current cursor x-axis
  * cur_y: current cursor y-axis
  * rowoff: current row offset
+ * coloff: current column offset
  * v_mode: current editor mode
  * v_run: editor current running status
  */
@@ -52,6 +53,7 @@ struct v_state {
 	int cur_x;
 	int cur_y;
 	int rowoff;
+	int coloff;
 	int v_mode;
 	int v_run;
 };

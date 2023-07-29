@@ -11,8 +11,7 @@ static int v_cur(struct v_state *v, int key)
 		return V_OK;
 	case CUR_RIGHT:
 		/* Cursor right */
-		if (v->cur_x != v->scr_x - 1)
-			v->cur_x++;
+		v->cur_x++;
 		return V_OK;
 	case CUR_UP:
 		/* Cursor up */
