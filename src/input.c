@@ -1,31 +1,42 @@
+#include <stddef.h>
 #include <ncurses.h>
 #include <void.h>
 
 static int v_cur(struct v_state *v, int key)
 {
+	struct v_row *row = (v->cur_y >= v->nrows) ? NULL : &v->rows[v->cur_y];
+
 	switch (key) {
 	case CUR_LEFT:
 		/* Cursor left */
 		if (v->cur_x != 0)
 			v->cur_x--;
-		return V_OK;
+		break;
 	case CUR_RIGHT:
 		/* Cursor right */
-		v->cur_x++;
-		return V_OK;
+		if (row && v->cur_x < row->len)
+			v->cur_x++;
+		break;
 	case CUR_UP:
 		/* Cursor up */
 		if (v->cur_y != 0)
 			v->cur_y--;
-		return V_OK;
+		break;
 	case CUR_DOWN:
 		/* Cursor down */
 		if (v->cur_y < v->nrows)
 			v->cur_y++;
-		return V_OK;
+		break;
+	default:
+		return V_ERR;
 	}
 
-	return V_ERR;
+	row = (v->cur_y >= v->nrows) ? NULL : &v->rows[v->cur_y];
+	int len = row ? row->len : 0;
+	if (v->cur_x > len)
+		v->cur_x = len;
+
+	return V_OK;
 }
 
 static void v_pg(struct v_state *v, int key)
@@ -37,6 +48,8 @@ static void v_pg(struct v_state *v, int key)
 
 static int v_nav(struct v_state *v, int key)
 {
+	struct v_row *row = (v->cur_y >= v->nrows) ? NULL : &v->rows[v->cur_y];
+
 	switch (key) {
 	case KEY_LEFT:
 		/* Arrow left */
@@ -56,7 +69,8 @@ static int v_nav(struct v_state *v, int key)
 		return V_OK;
 	case KEY_END:
 		/* End key */
-		v->cur_x = v->scr_x - 1;
+		if (row)
+			v->cur_x = row->len;
 		return V_OK;
 	case KEY_PPAGE:
 	case KEY_NPAGE:
