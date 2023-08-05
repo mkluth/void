@@ -7,6 +7,8 @@
 #define V_DESC		"A minimal text editor"
 #define V_WC		"void/Void " V_VER " -- " V_DESC
 
+#define V_TABSTP	8		/* Default tab stop size */
+
 #define V_OK		0		/* Return value success */
 #define V_ERR		1		/* Return value failure */
 #define V_TRUE		1		/* Boolean value for True */
@@ -22,12 +24,16 @@
 
 /*
  * struct v_row - stores line of text to be displayed
- * cont: the row content
- * len: the row length
+ * orig: the original string (unrendered)
+ * ren: the rendered string
+ * len: the original string length (unrendered)
+ * rlen: the rendered string length
  */
 struct v_row {
-	char *cont;
+	char *orig;
+	char *ren;
 	int len;
+	int rlen;
 };
 
 /*

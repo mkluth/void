@@ -3,6 +3,33 @@
 #include <string.h>
 #include <void.h>
 
+static int v_render_row(struct v_row *row)
+{
+	int tabs = 0;
+	for (int i = 0; i < row->len; i++)
+		if (row->orig[i] == '\t')
+			tabs++;
+	free(row->ren);
+	row->ren = malloc(row->len + tabs * (V_TABSTP - 1) + 1);
+	if (!row->ren)
+		return V_ERR;
+
+	int idx = 0;
+	for (int i = 0; i < row->len; i++) {
+		if (row->orig[i] != '\t') {
+			row->ren[idx++] = row->orig[i];
+			continue;
+		}
+		row->ren[idx++] = ' ';
+		while (idx % V_TABSTP)
+			row->ren[idx++] = ' ';
+	}
+	row->ren[idx] = '\0';
+	row->rlen = idx;
+
+	return V_OK;
+}
+
 /*
  * v_append_row - Append a new v_row into v_state
  * v: a pointer to a v_state struct
@@ -28,12 +55,17 @@ int v_append_row(struct v_state *v, char *s, int len)
 	tmp = NULL;
 	struct v_row *row = &v->rows[v->nrows];
 	row->len = len;
-	row->cont = malloc(len + 1);
-	if (!row->cont)
+	row->orig = malloc(len + 1);
+	if (!row->orig)
 		return -1;
 
-	memcpy(row->cont, s, len);
-	row->cont[len] = '\0';
+	memcpy(row->orig, s, len);
+	row->orig[len] = '\0';
+	row->ren = NULL;
+	row->rlen = 0;
+	if (v_render_row(&v->rows[v->nrows]) == V_ERR)
+		return V_ERR;
+
 	v->nrows++;
 	row = NULL;
 
@@ -56,9 +88,12 @@ int v_free_rows(struct v_state *v)
 
 	while (v->nrows--) {
 		struct v_row *row = &v->rows[v->nrows];
-		free(row->cont);
-		row->cont = NULL;
+		free(row->orig);
+		free(row->ren);
+		row->orig = NULL;
+		row->ren = NULL;
 		row->len = 0;
+		row->rlen = 0;
 		row = NULL;
 	}
 

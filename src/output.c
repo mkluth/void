@@ -30,13 +30,13 @@ static int v_draw_y(struct v_state *v, int y)
 	if (filerow < v->nrows) {
 		/* There is a row to be displayed */
 		struct v_row *row = &v->rows[filerow];
-		int len = row->len - v->coloff;
+		int len = row->rlen - v->coloff;
 		if (len < 0)
 			len = 0;
 		if (len > v->scr_x)
 			len = v->scr_x;
 
-		addnstr(&row->cont[v->coloff], len);
+		addnstr(&row->ren[v->coloff], len);
 
 		return V_OK;
 	}
