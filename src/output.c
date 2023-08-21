@@ -2,28 +2,6 @@
 #include <string.h>
 #include <void.h>
 
-static int v_vert_scroll(struct v_state *v)
-{
-	if (v->cur_y < v->rowoff)
-		v->rowoff = v->cur_y;
-
-	if (v->cur_y >= v->rowoff + v->scr_y)
-		v->rowoff = v->cur_y - v->scr_y + 1;
-
-	return V_OK;
-}
-
-static int v_horiz_scroll(struct v_state *v)
-{
-	if (v->cur_x < v->coloff)
-		v->coloff = v->cur_x;
-
-	if (v->cur_x >= v->coloff + v->scr_x)
-		v->coloff = v->cur_x - v->scr_x + 1;
-
-	return V_OK;
-}
-
 static int v_draw_y(struct v_state *v, int y)
 {
 	int filerow = v->rowoff + y;
@@ -77,6 +55,42 @@ static int v_draw_scr_y(struct v_state *v)
 	return V_OK;
 }
 
+static int v_ren_cur_x(struct v_row *row, int cur_x)
+{
+	if (!row || !row->orig || cur_x < 0)
+		return -1;
+
+	int x_pos = 0;
+	for (int i = 0; i < cur_x; i++) {
+		if (row->orig[i] == '\t')
+			x_pos += (V_TABSTP - 1) - (x_pos % V_TABSTP);
+		x_pos++;
+	}
+
+	return x_pos;
+}
+
+static int v_scroll(struct v_state *v)
+{
+	v->rcur_x = 0;
+	if (v->cur_y < v->nrows)
+		v->rcur_x = v_ren_cur_x(&v->rows[v->cur_y], v->cur_x);
+
+	if (v->cur_y < v->rowoff)
+		v->rowoff = v->cur_y;
+
+	if (v->cur_y >= v->rowoff + v->scr_y)
+		v->rowoff = v->cur_y - v->scr_y + 1;
+
+	if (v->rcur_x < v->coloff)
+		v->coloff = v->rcur_x;
+
+	if (v->rcur_x >= v->coloff + v->scr_x)
+		v->coloff = v->rcur_x - v->scr_x + 1;
+
+	return V_OK;
+}
+
 /*
  * v_rfsh_scr -- Refresh the editor screen
  * v: a pointer to a v_state struct
@@ -91,11 +105,10 @@ int v_rfsh_scr(struct v_state *v)
 			v->scr_x <= 0)
 		return V_ERR;
 
-	v_vert_scroll(v);
-	v_horiz_scroll(v);
+	v_scroll(v);
 	curs_set(2);
 	v_draw_scr_y(v);
-	move(v->cur_y - v->rowoff, v->cur_x - v->coloff);
+	move(v->cur_y - v->rowoff, v->rcur_x - v->coloff);
 	refresh();
 	curs_set(1);
 

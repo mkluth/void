@@ -22,6 +22,7 @@ struct v_state *v_new_state(void)
 	v->scr_y = 0;
 	v->cur_x = 0;
 	v->cur_y = 0;
+	v->rcur_x = 0;
 	v->rowoff = 0;
 	v->coloff = 0;
 	v->v_mode = V_CMD;
