@@ -73,8 +73,15 @@ static int v_nav(struct v_state *v, int key)
 			v->cur_x = row->len;
 		return V_OK;
 	case KEY_PPAGE:
+		/* Page Up */
+		v->cur_y = v->rowoff;
+		v_pg(v, key);
+		return V_OK;
 	case KEY_NPAGE:
-		/* Page Up and Page Down */
+		/* Page Down */
+		v->cur_y = v->rowoff + v->scr_x - 1;
+		if (v->cur_y > v->nrows)
+			v->cur_y = v->nrows;
 		v_pg(v, key);
 		return V_OK;
 	}
