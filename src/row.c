@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+
 #include <void.h>
 
 static int v_render_row(struct v_row *row)
@@ -24,6 +25,7 @@ static int v_render_row(struct v_row *row)
 		while (idx % V_TABSTP)
 			row->ren[idx++] = ' ';
 	}
+
 	row->ren[idx] = '\0';
 	row->rlen = idx;
 
@@ -32,14 +34,14 @@ static int v_render_row(struct v_row *row)
 
 /*
  * v_append_row - Append a new v_row into v_state
- * v: a pointer to a v_state struct
+ * v: pointer to v_state struct
  * s: string to be appended
  * len: length of string s
  *
  * Description:
  * Returns the newly updated number of rows upon successful completion.
- * Otherwise, -1 shall be returned instead. To easily free all the datas
- * associated with the v->rows array, check out v_free_rows().
+ * Otherwise, -1 shall be returned instead. To easily free all of the memories
+ * associated with the v->rows array, checkout v_free_rows().
  */
 int v_append_row(struct v_state *v, char *s, int len)
 {
@@ -73,13 +75,13 @@ int v_append_row(struct v_state *v, char *s, int len)
 }
 
 /*
- * v_free_rows - Free v_row related datas inside the specified v_state
- * v: a pointer to a v_state struct
+ * v_free_rows - Free v_row allocated memory inside the specified v_state
+ * v: pointer to v_state struct
  *
  * Description:
  * Returns V_OK upon successful completion. Otherwise, V_ERR shall be returned
- * instead. This function will deallocates any v_row related datas inside a
- * v_state, especially on the v->rows array.
+ * instead. This function will deallocate all of the related v_row allocated
+ * memory inside a v_state, especially on the v->rows array.
  */
 int v_free_rows(struct v_state *v)
 {

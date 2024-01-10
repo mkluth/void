@@ -1,5 +1,6 @@
 #include <ncurses.h>
 #include <string.h>
+
 #include <void.h>
 
 static int v_draw_y(struct v_state *v, int y)
@@ -55,7 +56,7 @@ static int v_draw_scr_y(struct v_state *v)
 	return V_OK;
 }
 
-static int v_ren_cur_x(struct v_row *row, int cur_x)
+static int v_render_cur_x(struct v_row *row, int cur_x)
 {
 	if (!row || !row->orig || cur_x < 0)
 		return -1;
@@ -74,7 +75,7 @@ static int v_scroll(struct v_state *v)
 {
 	v->rcur_x = 0;
 	if (v->cur_y < v->nrows)
-		v->rcur_x = v_ren_cur_x(&v->rows[v->cur_y], v->cur_x);
+		v->rcur_x = v_render_cur_x(&v->rows[v->cur_y], v->cur_x);
 
 	if (v->cur_y < v->rowoff)
 		v->rowoff = v->cur_y;
@@ -92,11 +93,12 @@ static int v_scroll(struct v_state *v)
 }
 
 /*
- * v_rfsh_scr -- Refresh the editor screen
- * v: a pointer to a v_state struct
+ * v_rfsh_scr -- Refresh the entire editor screen
+ * v: pointer to v_state struct
  *
  * Description:
- * Returns V_OK upon successful completion. Otherwise, V_ERR.
+ * Returns V_OK upon successful completion. Otherwise, V_ERR. Only works in
+ * curses mode.
  */
 int v_rfsh_scr(struct v_state *v)
 {

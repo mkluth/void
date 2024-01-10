@@ -7,17 +7,18 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include <void.h>
 
 /*
- * v_open - Open a file and save its content
- * v: a pointer to a v_state struct
+ * v_open - Open a file and save its content into the editor buffer
+ * v: pointer to v_state struct
  * filename: the filename to be open
  *
  * Description:
- * Returns V_OK upon successful completion. Otherwise, V_ERR. The file will be
- * opened (if exists) before its content being read and saved inside the
- * specified v_state.
+ * Returns V_OK upon successful completion. Otherwise, V_ERR. The file shall be
+ * opened (if exist) before its content being read and saved inside the
+ * specified v_state editor buffer.
  */
 int v_open(struct v_state *v, char *filename)
 {
@@ -41,6 +42,7 @@ int v_open(struct v_state *v, char *filename)
 	s = NULL;
 
 	return V_OK;
+
 error:
 	fclose(fp);
 	fp = NULL;

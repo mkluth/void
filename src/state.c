@@ -33,11 +33,11 @@ struct v_state *v_new_state(void)
 
 /*
  * v_dstr_state - Destroy the specified v_state struct
- * v: a pointer to a v_state struct
+ * v: pointer to v_state struct
  *
  * Description:
- * Returns V_OK on success, V_ERR otherwise. The v_state struct will be
- * deallocated and the pointer shall be setted to NULL.
+ * Returns V_OK on success, V_ERR otherwise. The specified v_state struct shall
+ * be deallocated.
  */
 int v_dstr_state(struct v_state *v)
 {
@@ -48,11 +48,10 @@ int v_dstr_state(struct v_state *v)
 		v_reset_term(v);
 
 	v_free_rows(v);
-	v->v_mode = 0;
+	v->v_mode = V_CMD;
 	v->v_run = V_FALSE;
 
 	free(v);
-	v = NULL;
 
 	return V_OK;
 }

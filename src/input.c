@@ -1,8 +1,9 @@
 #include <stddef.h>
 #include <ncurses.h>
+
 #include <void.h>
 
-static int v_cur(struct v_state *v, int key)
+static int v_cur_move(struct v_state *v, int key)
 {
 	struct v_row *row = (v->cur_y >= v->nrows) ? NULL : &v->rows[v->cur_y];
 
@@ -39,30 +40,30 @@ static int v_cur(struct v_state *v, int key)
 	return V_OK;
 }
 
-static void v_pg(struct v_state *v, int key)
+static void v_page_key(struct v_state *v, int key)
 {
 	int times = v->scr_y;
 	while (times--)
-		v_cur(v, key == KEY_PPAGE ? CUR_UP : CUR_DOWN);
+		v_cur_move(v, key == KEY_PPAGE ? CUR_UP : CUR_DOWN);
 }
 
-static int v_nav(struct v_state *v, int key)
+static int v_navigate_key(struct v_state *v, int key)
 {
 	struct v_row *row = (v->cur_y >= v->nrows) ? NULL : &v->rows[v->cur_y];
 
 	switch (key) {
 	case KEY_LEFT:
 		/* Arrow left */
-		return v_cur(v, CUR_LEFT);
+		return v_cur_move(v, CUR_LEFT);
 	case KEY_RIGHT:
 		/* Arrow right */
-		return v_cur(v, CUR_RIGHT);
+		return v_cur_move(v, CUR_RIGHT);
 	case KEY_UP:
 		/* Arrow up */
-		return v_cur(v, CUR_UP);
+		return v_cur_move(v, CUR_UP);
 	case KEY_DOWN:
 		/* Arrow down */
-		return v_cur(v, CUR_DOWN);
+		return v_cur_move(v, CUR_DOWN);
 	case KEY_HOME:
 		/* Home key */
 		v->cur_x = 0;
@@ -75,14 +76,14 @@ static int v_nav(struct v_state *v, int key)
 	case KEY_PPAGE:
 		/* Page Up */
 		v->cur_y = v->rowoff;
-		v_pg(v, key);
+		v_page_key(v, key);
 		return V_OK;
 	case KEY_NPAGE:
 		/* Page Down */
 		v->cur_y = v->rowoff + v->scr_x - 1;
 		if (v->cur_y > v->nrows)
 			v->cur_y = v->nrows;
-		v_pg(v, key);
+		v_page_key(v, key);
 		return V_OK;
 	}
 
@@ -91,12 +92,12 @@ static int v_nav(struct v_state *v, int key)
 
 /*
  * v_prcs_key - Read a key from the user and process it
- * v: pointer to a v_state struct
+ * v: pointer to v_state struct
  *
  * Description:
  * Upon successful completion, V_OK shall be returned. Otherwise, V_ERR shall
  * be returned instead. Do note that this function only works in curses mode
- * and in the editor command mode.
+ * and in the editor command mode (currently).
  */
 int v_prcs_key(struct v_state *v)
 {
@@ -106,7 +107,7 @@ int v_prcs_key(struct v_state *v)
 
 	int key = getch();
 
-	if (v_cur(v, key) == V_OK || v_nav(v, key) == V_OK)
+	if (v_cur_move(v, key) == V_OK || v_navigate_key(v, key) == V_OK)
 		return V_OK;
 
 	switch (key) {

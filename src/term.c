@@ -1,13 +1,14 @@
 #include <ncurses.h>
+
 #include <void.h>
 
 /*
  * v_init_term - Initialize the terminal into curses mode
- * v: a pointer to a v_state struct
+ * v: pointer to v_state struct
  *
  * Description:
  * Returns V_OK if successful, otherwise V_ERR. Don't forget to call
- * v_reset_term() before exiting.
+ * v_reset_term() before exiting the program.
  */
 int v_init_term(struct v_state *v)
 {
@@ -27,11 +28,11 @@ int v_init_term(struct v_state *v)
 
 /*
  * v_reset_term - Reset the terminal back into cooked mode
- * v: a pointer to a v_state struct
+ * v: pointer to v_state struct
  *
  * Description:
  * Returns V_OK if successful, else V_ERR. This function should be called
- * before exiting if v_init_term() is called previously.
+ * before exiting the program if v_init_term() is called previously.
  */
 int v_reset_term(struct v_state *v)
 {
