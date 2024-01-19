@@ -7,6 +7,10 @@
 #define V_DESC		"A minimal text editor"
 #define V_WC		"void/Void " V_VER " -- " V_DESC
 
+#define V_BAR		1		/* Editor bar colors pair number */
+#define V_BAR_FG	0		/* Editor bar foreground color */
+#define V_BAR_BG	7		/* Editor bar background color */
+
 #define V_TABSTP	8		/* Default tab stop size */
 
 #define V_OK		0		/* Return value success */
@@ -48,6 +52,7 @@ struct v_row {
  * rcur_x: current rendered cursor x-axis
  * rowoff: current row offset
  * coloff: current column offset
+ * v_colors: colors support Boolean value
  * v_mode: current editor mode
  * v_run: editor current running status
  */
@@ -62,6 +67,7 @@ struct v_state {
 	int rcur_x;
 	int rowoff;
 	int coloff;
+	int v_colors;
 	int v_mode;
 	int v_run;
 };
@@ -75,6 +81,7 @@ int v_prcs_key(struct v_state *v);
 
 /* src/term.c */
 int v_init_term(struct v_state *v);
+int v_init_colors(struct v_state *v);
 int v_reset_term(struct v_state *v);
 
 /* src/output.c */

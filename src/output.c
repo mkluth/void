@@ -56,6 +56,21 @@ static int v_draw_scr_y(struct v_state *v)
 	return V_OK;
 }
 
+static int v_draw_bar(struct v_state *v)
+{
+	wmove(v->v_win, v->scr_y, 0);
+	wattron(v->v_win, COLOR_PAIR(V_BAR));
+	int x = 0;
+	while (x < v->scr_x) {
+		wprintw(v->v_win, " ");
+		x++;
+	}
+
+	wattroff(v->v_win, COLOR_PAIR(V_BAR));
+
+	return V_OK;
+}
+
 static int v_render_cur_x(struct v_row *row, int cur_x)
 {
 	if (!row || !row->orig || cur_x < 0)
@@ -110,6 +125,7 @@ int v_rfsh_scr(struct v_state *v)
 	v_scroll(v);
 	curs_set(2);
 	v_draw_scr_y(v);
+	v_draw_bar(v);
 	wmove(v->v_win, v->cur_y - v->rowoff, v->rcur_x - v->coloff);
 	wrefresh(v->v_win);
 	curs_set(1);

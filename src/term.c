@@ -22,8 +22,34 @@ int v_init_term(struct v_state *v)
 	halfdelay(1);
 
 	getmaxyx(v->v_win, v->scr_y, v->scr_x);
+	v->scr_y -= 1;
 
 	return V_OK;
+}
+
+/*
+ * v_init_colors - Initialize the terminal colors support
+ * v: pointer to v_state struct
+ *
+ * Description:
+ * Returns V_OK if the terminal does support colors manipulation. Otherwise,
+ * V_ERR shall be returns. You can only call this function once v_init_term()
+ * is called previously.
+ */
+int v_init_colors(struct v_state *v)
+{
+	if (!v->v_win || !has_colors())
+		goto error;
+
+	v->v_colors = V_TRUE;
+	start_color();
+	init_pair(V_BAR, V_BAR_FG, V_BAR_BG);
+
+	return V_OK;
+
+error:
+	v->v_colors = V_FALSE;
+	return V_ERR;
 }
 
 /*

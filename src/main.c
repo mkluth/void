@@ -6,6 +6,7 @@ int main(int argc, char **argv)
 {
 	struct v_state *v = v_new_state();
 	v_init_term(v);
+	v_init_colors(v);
 
 	if (argc >= 2)
 		v_open(v, argv[1]);
