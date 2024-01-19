@@ -101,7 +101,7 @@ static int v_navigate_key(struct v_state *v, int key)
  */
 int v_prcs_key(struct v_state *v)
 {
-	if (!v || v->v_mode != V_CMD || !v->v_stdscr || v->cur_x < 0 ||
+	if (!v || v->v_mode != V_CMD || !v->v_win || v->cur_x < 0 ||
 			v->cur_y < 0 || v->scr_x <= 0 || v->scr_y <= 0)
 		return V_ERR;
 

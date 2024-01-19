@@ -15,7 +15,7 @@ static int v_draw_y(struct v_state *v, int y)
 		if (len > v->scr_x)
 			len = v->scr_x;
 
-		addnstr(&row->ren[v->coloff], len);
+		waddnstr(v->v_win, &row->ren[v->coloff], len);
 
 		return V_OK;
 	}
@@ -28,19 +28,19 @@ static int v_draw_y(struct v_state *v, int y)
 
 		int padding = (v->scr_x - len) / 2;
 		if (padding) {
-			printw("~");
+			wprintw(v->v_win, "~");
 			padding--;
 		}
 
 		while (padding--)
-			printw(" ");
+			wprintw(v->v_win, " ");
 
-		addnstr(V_WC, len);
+		waddnstr(v->v_win, V_WC, len);
 
 		return V_OK;
 	}
 
-	printw("~\n");
+	wprintw(v->v_win, "~\n");
 
 	return V_OK;
 }
@@ -48,9 +48,9 @@ static int v_draw_y(struct v_state *v, int y)
 static int v_draw_scr_y(struct v_state *v)
 {
 	for (int y = 0; y < v->scr_y; y++) {
-		move(y, 0);
+		wmove(v->v_win, y, 0);
 		v_draw_y(v, y);
-		clrtoeol();
+		wclrtoeol(v->v_win);
 	}
 
 	return V_OK;
@@ -102,7 +102,7 @@ static int v_scroll(struct v_state *v)
  */
 int v_rfsh_scr(struct v_state *v)
 {
-	if (!v || !v->v_stdscr || v->cur_x < 0 || v->cur_y < 0 ||
+	if (!v || !v->v_win || v->cur_x < 0 || v->cur_y < 0 ||
 			v->rowoff < 0 || v->coloff < 0 || v->scr_y <= 0 ||
 			v->scr_x <= 0)
 		return V_ERR;
@@ -110,8 +110,8 @@ int v_rfsh_scr(struct v_state *v)
 	v_scroll(v);
 	curs_set(2);
 	v_draw_scr_y(v);
-	move(v->cur_y - v->rowoff, v->rcur_x - v->coloff);
-	refresh();
+	wmove(v->v_win, v->cur_y - v->rowoff, v->rcur_x - v->coloff);
+	wrefresh(v->v_win);
 	curs_set(1);
 
 	return V_OK;

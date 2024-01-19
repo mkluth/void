@@ -15,7 +15,7 @@ struct v_state *v_new_state(void)
 	if (!v)
 		return NULL;
 
-	v->v_stdscr = NULL;
+	v->v_win = NULL;
 	v->rows = NULL;
 	v->nrows = 0;
 	v->scr_x = 0;
@@ -44,7 +44,7 @@ int v_dstr_state(struct v_state *v)
 	if (!v)
 		return V_ERR;
 
-	if (v->v_stdscr)
+	if (v->v_win)
 		v_reset_term(v);
 
 	v_free_rows(v);

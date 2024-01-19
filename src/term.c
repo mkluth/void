@@ -12,16 +12,16 @@
  */
 int v_init_term(struct v_state *v)
 {
-	if (!v || v->v_stdscr)
+	if (!v || v->v_win)
 		return V_ERR;
 
-	v->v_stdscr = initscr();
+	v->v_win = initscr();
 	raw();
-	keypad(v->v_stdscr, TRUE);
+	keypad(v->v_win, TRUE);
 	noecho();
 	halfdelay(1);
 
-	getmaxyx(v->v_stdscr, v->scr_y, v->scr_x);
+	getmaxyx(v->v_win, v->scr_y, v->scr_x);
 
 	return V_OK;
 }
@@ -36,11 +36,11 @@ int v_init_term(struct v_state *v)
  */
 int v_reset_term(struct v_state *v)
 {
-	if (!v || !v->v_stdscr)
+	if (!v || !v->v_win)
 		return V_ERR;
 
 	endwin();
-	v->v_stdscr = NULL;
+	v->v_win = NULL;
 	v->scr_x = 0;
 	v->scr_y = 0;
 	v->cur_x = 0;

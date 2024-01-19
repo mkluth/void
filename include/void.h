@@ -38,7 +38,7 @@ struct v_row {
 
 /*
  * struct v_state - current thread information
- * v_stdscr: pointer to NCURSES stdscr WINDOW struct
+ * v_win: pointer to NCURSES WINDOW struct
  * rows: an array of v_row structs
  * nrows: number of rows available
  * scr_x: value of screen x-axis
@@ -52,7 +52,7 @@ struct v_row {
  * v_run: editor current running status
  */
 struct v_state {
-	WINDOW *v_stdscr;
+	WINDOW *v_win;
 	struct v_row *rows;
 	int nrows;
 	int scr_x;
