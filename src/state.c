@@ -26,6 +26,7 @@ struct v_state *v_new_state(void)
 	v->rcur_x = 0;
 	v->rowoff = 0;
 	v->coloff = 0;
+	v->v_colors = V_FALSE;
 	v->v_mode = V_CMD;
 	v->v_run = V_TRUE;
 
