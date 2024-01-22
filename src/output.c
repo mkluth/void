@@ -59,14 +59,27 @@ static int v_draw_scr_y(struct v_state *v)
 static int v_draw_bar(struct v_state *v)
 {
 	wmove(v->v_win, v->scr_y, 0);
-	wattron(v->v_win, COLOR_PAIR(V_BAR));
-	int x = 0;
-	while (x < v->scr_x) {
+	char txt[v->scr_x];
+	int len = snprintf(txt, sizeof(txt), "%.20s - %d",
+			v->filename ? v->filename : "[No Name]", v->nrows);
+	if (len < 0)
+		return V_ERR;
+
+	if (v->v_colors)
+		wattron(v->v_win, A_BOLD | COLOR_PAIR(V_BAR));
+	else
+		wattron(v->v_win, A_BOLD);
+
+	wprintw(v->v_win, "%s", txt);
+	while (len < v->scr_x) {
 		wprintw(v->v_win, " ");
-		x++;
+		len++;
 	}
 
-	wattroff(v->v_win, COLOR_PAIR(V_BAR));
+	if (v->v_colors)
+		wattroff(v->v_win, A_BOLD | COLOR_PAIR(V_BAR));
+	else
+		wattroff(v->v_win, A_BOLD);
 
 	return V_OK;
 }

@@ -26,6 +26,7 @@ int v_open(struct v_state *v, char *filename)
 	if (!fp)
 		return V_ERR;
 
+	v->filename = strdup(filename);
 	char *s = NULL;
 	size_t cap = 0;
 	ssize_t len = 0;

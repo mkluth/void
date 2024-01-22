@@ -4,7 +4,7 @@
 #include <ncurses.h>
 
 #define V_VER		"0.0.1"
-#define V_DESC		"A minimal text editor"
+#define V_DESC		"A stupid UNIX text editor"
 #define V_WC		"void/Void " V_VER " -- " V_DESC
 
 #define V_BAR		1		/* Editor bar colors pair number */
@@ -53,6 +53,7 @@ struct v_row {
  * rowoff: current row offset
  * coloff: current column offset
  * v_colors: colors support Boolean value
+ * filename: currently opened filename
  * v_mode: current editor mode
  * v_run: editor current running status
  */
@@ -68,6 +69,7 @@ struct v_state {
 	int rowoff;
 	int coloff;
 	int v_colors;
+	char *filename;
 	int v_mode;
 	int v_run;
 };

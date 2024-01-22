@@ -27,6 +27,7 @@ struct v_state *v_new_state(void)
 	v->rowoff = 0;
 	v->coloff = 0;
 	v->v_colors = V_FALSE;
+	v->filename = NULL;
 	v->v_mode = V_CMD;
 	v->v_run = V_TRUE;
 
@@ -50,6 +51,8 @@ int v_dstr_state(struct v_state *v)
 		v_reset_term(v);
 
 	v_free_rows(v);
+	free(v->filename);
+	v->filename = NULL;
 	v->v_mode = V_CMD;
 	v->v_run = V_FALSE;
 
