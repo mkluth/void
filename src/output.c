@@ -60,8 +60,10 @@ static int v_draw_bar(struct v_state *v)
 {
 	wmove(v->v_win, v->scr_y, 0);
 	char txt[v->scr_x];
-	int len = snprintf(txt, sizeof(txt), "%.20s - %d",
-			v->filename ? v->filename : "[No Name]", v->nrows);
+	int len = snprintf(txt, sizeof(txt), "%s %s %d,%d",
+			v->filename ? v->filename : "[No Name]",
+			v->v_unsaved ? "[+]" : "", v->cur_y + 1,
+			v->rcur_x + 1);
 	if (len < 0)
 		return V_ERR;
 
@@ -121,7 +123,7 @@ static int v_scroll(struct v_state *v)
 }
 
 /*
- * v_rfsh_scr -- Refresh the entire editor screen
+ * v_rfsh_scr - Refresh the entire editor screen
  * v: pointer to v_state struct
  *
  * Description:

@@ -11,7 +11,7 @@
 #define V_BAR_FG	0		/* Editor bar foreground color */
 #define V_BAR_BG	7		/* Editor bar background color */
 
-#define V_TABSTP	8		/* Default tab stop size */
+#define V_TABSTP	8		/* Default tabstop size */
 
 #define V_OK		0		/* Return value success */
 #define V_ERR		1		/* Return value failure */
@@ -27,7 +27,7 @@
 #define CUR_RIGHT	108		/* Move cursor rightwards */
 
 /*
- * struct v_row - stores line of text to be displayed
+ * struct v_row - Represent a line of text to be displayed
  * orig: the original string (unrendered)
  * ren: the rendered string
  * len: the original string length (unrendered)
@@ -41,21 +41,22 @@ struct v_row {
 };
 
 /*
- * struct v_state - current thread information
+ * struct v_state - Current thread information
  * v_win: pointer to NCURSES WINDOW struct
- * rows: an array of v_row structs
- * nrows: number of rows available
- * scr_x: value of screen x-axis
- * scr_y: value of screen y-axis
+ * rows: array of v_row structs
+ * nrows: number of available v_row structs
+ * scr_x: maximum value of screen x-axis
+ * scr_y: maximum value of screen y-axis
  * cur_x: current cursor x-axis
  * cur_y: current cursor y-axis
- * rcur_x: current rendered cursor x-axis
+ * rcur_x: current cursor x-axis (rendered)
  * rowoff: current row offset
  * coloff: current column offset
- * v_colors: colors support Boolean value
+ * v_colors: colors support flag
  * filename: currently opened filename
+ * unsaved: available unsaved changes
  * v_mode: current editor mode
- * v_run: editor current running status
+ * v_run: current editor running status
  */
 struct v_state {
 	WINDOW *v_win;
@@ -70,6 +71,7 @@ struct v_state {
 	int coloff;
 	int v_colors;
 	char *filename;
+	int v_unsaved;
 	int v_mode;
 	int v_run;
 };
