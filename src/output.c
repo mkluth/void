@@ -68,7 +68,7 @@ static int v_draw_bar(struct v_state *v)
 		return V_ERR;
 
 	if (v->v_colors)
-		wattron(v->v_win, A_BOLD | COLOR_PAIR(V_BAR));
+		wattron(v->v_win, COLOR_PAIR(V_BAR));
 	else
 		wattron(v->v_win, A_BOLD);
 

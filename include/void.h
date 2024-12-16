@@ -7,9 +7,9 @@
 #define V_DESC		"A stupid UNIX text editor"
 #define V_WC		"void/Void " V_VER " -- " V_DESC
 
-#define V_BAR		1		/* Editor bar colors pair number */
-#define V_BAR_FG	0		/* Editor bar foreground color */
-#define V_BAR_BG	7		/* Editor bar background color */
+#define V_BAR		1		/* Editor bar color pair number */
+#define V_BAR_FG	COLOR_BLACK	/* Editor bar foreground color */
+#define V_BAR_BG	COLOR_WHITE	/* Editor bar background color */
 
 #define V_TABSTP	8		/* Default tabstop size */
 
