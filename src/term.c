@@ -22,7 +22,7 @@ int v_init_term(struct v_state *v)
 	halfdelay(1);
 
 	getmaxyx(v->v_win, v->scr_y, v->scr_x);
-	v->scr_y -= 1;
+	v->scr_y -= 2;
 
 	return V_OK;
 }

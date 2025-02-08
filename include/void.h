@@ -2,10 +2,14 @@
 #define VOID_H
 
 #include <ncurses.h>
+#include <time.h>
 
 #define V_VER		"0.0.1"
 #define V_DESC		"A stupid UNIX text editor"
 #define V_WC		"void/Void " V_VER " -- " V_DESC
+
+#define V_STATS_MSG_BUF	80		/* Status message buffer */
+#define V_STATS_MSG_TIMEOUT	5	/* Status message timeout (seconds) */
 
 #define V_BAR		1		/* Editor bar color pair number */
 #define V_BAR_FG	COLOR_BLACK	/* Editor bar foreground color */
@@ -54,6 +58,8 @@ struct v_row {
  * coloff: current column offset
  * v_colors: colors support flag
  * filename: currently opened filename
+ * stats_msg: status message string (view V_STATS_MSG_BUF macro)
+ * stats_msg_time: timestamp when a status message is setted
  * unsaved: available unsaved changes
  * v_mode: current editor mode
  * v_run: current editor running status
@@ -71,6 +77,8 @@ struct v_state {
 	int coloff;
 	int v_colors;
 	char *filename;
+	char stats_msg[V_STATS_MSG_BUF];
+	time_t stats_msg_time;
 	int v_unsaved;
 	int v_mode;
 	int v_run;
@@ -89,6 +97,7 @@ int v_init_colors(struct v_state *v);
 int v_reset_term(struct v_state *v);
 
 /* src/output.c */
+int v_set_stats_msg(struct v_state *v, const char *fmt, ...);
 int v_rfsh_scr(struct v_state *v);
 
 /* src/fileio.c */

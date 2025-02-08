@@ -1,5 +1,7 @@
 #include <ncurses.h>
 #include <string.h>
+#include <stdarg.h>
+#include <time.h>
 
 #include <void.h>
 
@@ -83,6 +85,8 @@ static int v_draw_bar(struct v_state *v)
 	else
 		wattroff(v->v_win, A_BOLD);
 
+	wprintw(v->v_win, "\r\n");
+
 	return V_OK;
 }
 
@@ -123,6 +127,52 @@ static int v_scroll(struct v_state *v)
 }
 
 /*
+ * v_set_stats_msg - Set the editor status message
+ * v: pointer to v_state struct
+ * fmt: formatted string
+ *
+ * Description:
+ * Returns the length of the formatted string if success, otherwise -1 shall
+ * be returned instead. This function is variadic. It can takes any number of
+ * arguments just like printf() do. This function will saves the formatted
+ * string into v->stats_msg. The maximum buffer of v->stats_msg depending on
+ * the value of V_STATS_MSG_BUF macro. Do note that a status message will not
+ * permanently displayed, it will get erased once the timestamp of the message
+ * exceeded the value of V_STATS_MSG_TIMEOUT seconds. The higher the value
+ * of V_STATS_MSG_TIMEOUT is, the longer the time the message will be displayed.
+ */
+int v_set_stats_msg(struct v_state *v, const char *fmt, ...)
+{
+	if (!v)
+		return -1;
+
+	va_list ap;
+	va_start(ap, fmt);
+	int len = vsnprintf(v->stats_msg, sizeof(v->stats_msg), fmt, ap);
+	if (len < 0)
+		return -1;
+
+	va_end(ap);
+	v->stats_msg_time = time(NULL);
+
+	return len;
+}
+
+static int v_draw_msg_bar(struct v_state *v)
+{
+	wclrtoeol(v->v_win);
+	int msg_len =  strlen(v->stats_msg);
+
+	if (msg_len > v->scr_x)
+		msg_len = v->scr_x;
+
+	if (msg_len && time(NULL) - v->stats_msg_time < V_STATS_MSG_TIMEOUT)
+		waddnstr(v->v_win, v->stats_msg, msg_len);
+
+	return V_OK;
+}
+
+/*
  * v_rfsh_scr - Refresh the entire editor screen
  * v: pointer to v_state struct
  *
@@ -141,6 +191,7 @@ int v_rfsh_scr(struct v_state *v)
 	curs_set(2);
 	v_draw_scr_y(v);
 	v_draw_bar(v);
+	v_draw_msg_bar(v);
 	wmove(v->v_win, v->cur_y - v->rowoff, v->rcur_x - v->coloff);
 	wrefresh(v->v_win);
 	curs_set(1);

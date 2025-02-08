@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stddef.h>
+#include <string.h>
 
 #include <void.h>
 
@@ -28,6 +29,8 @@ struct v_state *v_new_state(void)
 	v->coloff = 0;
 	v->v_colors = V_FALSE;
 	v->filename = NULL;
+	memset(v->stats_msg, 0, sizeof(v->stats_msg));
+	v->stats_msg_time = 0;
 	v->v_unsaved = V_FALSE;
 	v->v_mode = V_CMD;
 	v->v_run = V_TRUE;
@@ -52,6 +55,8 @@ int v_dstr_state(struct v_state *v)
 		v_reset_term(v);
 
 	v_free_rows(v);
+	memset(v->stats_msg, 0, sizeof(v->stats_msg));
+	v->stats_msg_time = 0;
 	free(v->filename);
 	v->filename = NULL;
 	v->v_unsaved = V_FALSE;
