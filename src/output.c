@@ -69,12 +69,15 @@ static int v_draw_bar(struct v_state *v)
 	if (len < 0)
 		return V_ERR;
 
+	if (len > v->scr_x)
+		len = v->scr_x;
+
 	if (v->v_colors)
 		wattron(v->v_win, COLOR_PAIR(V_BAR));
 	else
 		wattron(v->v_win, A_BOLD);
 
-	wprintw(v->v_win, "%s", txt);
+	waddnstr(v->v_win, txt, len);
 	while (len < v->scr_x) {
 		wprintw(v->v_win, " ");
 		len++;

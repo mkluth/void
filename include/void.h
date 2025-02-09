@@ -8,7 +8,7 @@
 #define V_DESC		"A stupid UNIX text editor"
 #define V_WC		"void/Void " V_VER " -- " V_DESC
 
-#define V_STATS_MSG_BUF	80		/* Status message buffer */
+#define V_STATS_MSG_BUF		100		/* Status message buffer */
 #define V_STATS_MSG_TIMEOUT	5	/* Status message timeout (seconds) */
 
 #define V_BAR		1		/* Editor bar color pair number */
