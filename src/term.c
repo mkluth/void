@@ -19,7 +19,6 @@ int v_init_term(struct v_state *v)
 	raw();
 	keypad(v->v_win, TRUE);
 	noecho();
-	halfdelay(1);
 
 	getmaxyx(v->v_win, v->scr_y, v->scr_x);
 	v->scr_y -= 2;

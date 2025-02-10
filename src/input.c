@@ -90,6 +90,56 @@ static int v_navigate_key(struct v_state *v, int key)
 	return V_ERR;
 }
 
+static int v_cmd_mode_input(struct v_state *v, int key)
+{
+	if (v_cur_move(v, key) == V_OK || v_navigate_key(v, key) == V_OK)
+		return V_OK;
+
+	switch (key) {
+	case CTRL('q'):
+		/* Ctrl-Q: Exit the editor */
+		v->v_run = V_FALSE;
+		return V_OK;
+	case 'i':
+	case 'I':
+		/* i or I: Switch into Insert Mode */
+		v->v_mode = V_INSERT;
+		v_set_stats_msg(v, "-- INSERT --");
+		return V_OK;
+	}
+
+	return V_ERR;
+}
+
+static int v_insert_mode_input(struct v_state *v, int key)
+{
+	if (v_navigate_key(v, key) == V_OK)
+		return V_OK;
+
+	switch (key) {
+	case CTRL('['):
+	case CTRL('\n'):
+		/*
+		 * ESC or Ctrl-[ or Ctrl-Enter: Switch into Command Mode
+		 *
+		 * Unfortunately, there will be a slight delay of 1 second if
+		 * the ESC key is pressed. This is due to the fact that I
+		 * enabled the keypad() function for the editor when the
+		 * terminal is being initialized into curses mode and I don't
+		 * have any plan of changing it in the future. Like, I use
+		 * keypad keys a lot, so don't question me here.
+		 */
+		v->v_mode = V_CMD;
+		v_set_stats_msg(v, "");
+		return V_OK;
+	}
+
+	if (v_insert_char(v, key) != -1)
+		return V_OK;
+
+	return V_ERR;
+}
+
 /*
  * v_prcs_key - Read a key from the user and process it
  * v: pointer to v_state struct
@@ -101,21 +151,17 @@ static int v_navigate_key(struct v_state *v, int key)
  */
 int v_prcs_key(struct v_state *v)
 {
-	if (!v || v->v_mode != V_CMD || !v->v_win || v->cur_x < 0 ||
-			v->cur_y < 0 || v->scr_x <= 0 || v->scr_y <= 0)
+	if (!v || !v->v_win || v->cur_x < 0 || v->cur_y < 0 || v->scr_x <= 0 ||
+			v->scr_y <= 0)
 		return V_ERR;
 
+	int stats = V_OK;
 	int key = getch();
 
-	if (v_cur_move(v, key) == V_OK || v_navigate_key(v, key) == V_OK)
-		return V_OK;
+	if (v->v_mode == V_CMD)
+		stats = v_cmd_mode_input(v, key);
+	else
+		stats = v_insert_mode_input(v, key);
 
-	switch (key) {
-	case CTRL('q'):
-		/* Ctrl-Q: Exit the editor */
-		v->v_run = V_FALSE;
-		return V_OK;
-	}
-
-	return V_ERR;
+	return stats;
 }

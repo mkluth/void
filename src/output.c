@@ -169,7 +169,7 @@ static int v_draw_msg_bar(struct v_state *v)
 	if (msg_len > v->scr_x)
 		msg_len = v->scr_x;
 
-	if (msg_len && time(NULL) - v->stats_msg_time < V_STATS_MSG_TIMEOUT)
+	if (msg_len)
 		waddnstr(v->v_win, v->stats_msg, msg_len);
 
 	return V_OK;

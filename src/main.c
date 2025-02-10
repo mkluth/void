@@ -11,8 +11,6 @@ int main(int argc, char **argv)
 	if (argc >= 2)
 		v_open(v, argv[1]);
 
-	v_set_stats_msg(v, "Use Ctrl-Q to Exit");
-
 	while (v->v_run) {
 		v_rfsh_scr(v);
 		v_prcs_key(v);

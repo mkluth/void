@@ -106,3 +106,32 @@ int v_free_rows(struct v_state *v)
 
 	return V_OK;
 }
+
+/*
+ * v_row_insert_char - Inserts a single char into a v_row at a given position
+ * row: pointer to the targeted v_row struct
+ * at: index to insert the char into
+ * c: the char to be inserted
+ *
+ * Description:
+ * Returns the newly updated length of the v_row's original string. -1 shall
+ * be returned instead if failed. The newly updated original string will
+ * rendered automatically by v_render_row() before this function exits.
+ */
+int v_row_insert_char(struct v_row *row, int at, int c)
+{
+	if (at < 0 || at > row->len)
+		at = row->len;
+
+	char *tmp = realloc(row->orig, row->len + 2);
+	if (!tmp)
+		return -1;
+
+	row->orig = tmp;
+	memmove(&row->orig[at + 1], &row->orig[at], row->len - at + 1);
+	row->len++;
+	row->orig[at] = c;
+	v_render_row(row);
+
+	return row->len;
+}
