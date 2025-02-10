@@ -132,6 +132,18 @@ static int v_insert_mode_input(struct v_state *v, int key)
 		v->v_mode = V_CMD;
 		v_set_stats_msg(v, "");
 		return V_OK;
+	case '\r':
+		/* TODO */
+		return V_OK;
+	case KEY_BACKSPACE:
+	case CTRL('h'):
+	case KEY_DL:
+	case KEY_DC:
+		/* TODO */
+		return V_OK;
+	case CTRL('l'):
+		/* Will not be handled */
+		return V_OK;
 	}
 
 	if (v_insert_char(v, key) != -1)
