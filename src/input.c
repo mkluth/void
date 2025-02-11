@@ -106,6 +106,10 @@ static int v_cmd_mode_input(struct v_state *v, int key)
 		v->v_mode = V_INSERT;
 		v_set_stats_msg(v, "-- INSERT --");
 		return V_OK;
+	case CTRL('s'):
+		/* Ctrl-S: Write out to a file */
+		v_save_file(v);
+		return V_OK;
 	}
 
 	return V_ERR;

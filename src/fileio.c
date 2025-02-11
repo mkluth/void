@@ -7,6 +7,9 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
 
 #include <void.h>
 
@@ -49,6 +52,80 @@ error:
 	fp = NULL;
 	free(s);
 	s = NULL;
+
+	return V_ERR;
+}
+
+static char *v_rows_to_str(struct v_state *v, int *buf_len)
+{
+	int i = 0;
+	int total_len = 0;
+
+	for (i = 0; i < v->nrows; i++)
+		total_len += v->rows[i].len + 1;
+	*buf_len = total_len;
+
+	char *buf = malloc(sizeof(char) * total_len);
+	if (!buf)
+		return NULL;
+
+	char *p = buf;
+	for (i = 0; i < v->nrows; i++) {
+		memcpy(p, v->rows[i].orig, v->rows[i].len);
+		p += v->rows[i].len;
+		*p = '\n';
+		p++;
+	}
+
+	return buf;
+}
+
+/*
+ * v_save_file - Save file to disk
+ * v: pointer to v_state struct
+ *
+ * Description:
+ * Returns V_OK upon successful completion, V_ERR otherwise. The v->rows array
+ * shall be converted into one long string before it got written to disk.
+ */
+int v_save_file(struct v_state *v)
+{
+	if (!v || !v->filename)
+		return V_ERR;
+
+	int fd = 0;
+	char *content = NULL;
+	int len = 0;
+
+	content = v_rows_to_str(v, &len);
+	if (!content)
+		return V_ERR;
+
+	fd = open(v->filename, O_RDWR | O_CREAT, V_FILE_MODE);
+	if (fd == -1)
+		goto cleanup;
+
+	if (ftruncate(fd, len) == -1)
+		goto cleanup;
+
+	if (write(fd, content, len) != len)
+		goto cleanup;
+
+	close(fd);
+	free(content);
+	content = NULL;
+
+	v_set_stats_msg(v, "%dL %dB written out to disk", v->nrows, len);
+
+	return V_OK;
+
+cleanup:
+	if (fd != - 1)
+		close(fd);
+	free(content);
+	content = NULL;
+
+	v_set_stats_msg(v, "ERR: %s", strerror(errno));
 
 	return V_ERR;
 }

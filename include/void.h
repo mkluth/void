@@ -16,6 +16,7 @@
 #define V_BAR_BG	COLOR_WHITE	/* Editor bar background color */
 
 #define V_TABSTP	8		/* Default tabstop size */
+#define V_FILE_MODE	0644		/* Default text files permission */
 
 #define V_OK		0		/* Return value success */
 #define V_ERR		1		/* Return value failure */
@@ -102,6 +103,7 @@ int v_rfsh_scr(struct v_state *v);
 
 /* src/fileio.c */
 int v_open(struct v_state *v, char *filename);
+int v_save_file(struct v_state *v);
 
 /* src/editor.c */
 int v_insert_char(struct v_state *v, int c);
