@@ -26,6 +26,7 @@ int v_insert_char(struct v_state *v, int c)
 		return -1;
 
 	v->cur_x++;
+	v->v_unsaved = V_TRUE;
 
 	return v->cur_x;
 }

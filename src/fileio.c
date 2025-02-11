@@ -114,6 +114,7 @@ int v_save_file(struct v_state *v)
 	close(fd);
 	free(content);
 	content = NULL;
+	v->v_unsaved = V_FALSE;
 
 	v_set_stats_msg(v, "%dL %dB written out to disk", v->nrows, len);
 
