@@ -137,9 +137,8 @@ static int v_insert_mode_input(struct v_state *v, int key)
 
 	switch (key) {
 	case CTRL('['):
-	case CTRL('\n'):
 		/*
-		 * ESC or Ctrl-[ or Ctrl-Enter: Switch into Command Mode
+		 * ESC or Ctrl-[: Switch into Command Mode
 		 *
 		 * Unfortunately, there will be a slight delay of 1 second if
 		 * the ESC key is pressed. This is due to the fact that I
@@ -152,13 +151,13 @@ static int v_insert_mode_input(struct v_state *v, int key)
 		v_set_stats_msg(v, "");
 		return V_OK;
 	case '\r':
+	case '\n':
 		/* TODO */
 		return V_OK;
 	case KEY_BACKSPACE:
 	case CTRL('h'):
-	case KEY_DL:
-	case KEY_DC:
-		/* TODO */
+		/* BACKSPACE or Ctrl-H: Delete a character on the leftside */
+		v_del_char(v);
 		return V_OK;
 	case CTRL('l'):
 		/* Will not be handled */

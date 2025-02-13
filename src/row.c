@@ -116,7 +116,7 @@ int v_free_rows(struct v_state *v)
  * Description:
  * Returns the newly updated length of the v_row's original string. -1 shall
  * be returned instead if failed. The newly updated original string will
- * rendered automatically by v_render_row() before this function exits.
+ * rendered automatically before this function exits.
  */
 int v_row_insert_char(struct v_row *row, int at, int c)
 {
@@ -131,6 +131,34 @@ int v_row_insert_char(struct v_row *row, int at, int c)
 	memmove(&row->orig[at + 1], &row->orig[at], row->len - at + 1);
 	row->len++;
 	row->orig[at] = c;
+	v_render_row(row);
+
+	return row->len;
+}
+
+/*
+ * v_row_del_char - Deletes a single char inside v_row at a given position
+ * row: pointer to the targeted v_row struct
+ * at: index to delete the char at
+ *
+ * Description:
+ * Returns the updated length of the v_row's original string upon successful
+ * completion. -1 shall be returned otherwise. The newly updated original string
+ * will be rendered automatically before this function exits. Do note that the
+ * deletion of the character will only take place on the character which located
+ * on the leftside of the cursor.
+ */
+int v_row_del_char(struct v_row *row, int at)
+{
+	if (at < 0 || at >= row->len)
+		return -1;
+
+	/*
+	 * We don't actually 'delete' the character, but rather we overlap it
+	 * with the character that comes after it.
+	 */
+	memmove(&row->orig[at], &row->orig[at + 1], row->len - at);
+	row->len--;
 	v_render_row(row);
 
 	return row->len;
