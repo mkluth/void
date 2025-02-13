@@ -90,6 +90,21 @@ static int v_navigate_key(struct v_state *v, int key)
 	return V_ERR;
 }
 
+static void v_exit(struct v_state *v)
+{
+	if (v->v_unsaved) {
+		v_set_stats_msg(v,
+			"WARNING: Unsaved changes. Press Ctrl-Q again to confirm.");
+		v_rfsh_scr(v);
+		if (getch() != CTRL('q')) {
+			v_set_stats_msg(v, "");
+			return;
+		}
+	}
+
+	v->v_run = V_FALSE;
+}
+
 static int v_cmd_mode_input(struct v_state *v, int key)
 {
 	if (v_cur_move(v, key) == V_OK || v_navigate_key(v, key) == V_OK)
@@ -98,7 +113,7 @@ static int v_cmd_mode_input(struct v_state *v, int key)
 	switch (key) {
 	case CTRL('q'):
 		/* Ctrl-Q: Exit the editor */
-		v->v_run = V_FALSE;
+		v_exit(v);
 		return V_OK;
 	case 'i':
 	case 'I':
