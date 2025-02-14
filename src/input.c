@@ -125,6 +125,10 @@ static int v_cmd_mode_input(struct v_state *v, int key)
 		/* Ctrl-S: Write out to a file */
 		v_save_file(v);
 		return V_OK;
+	case CTRL('l'):
+		/* Ctrl-L: Force refresh the editor screen */
+		v_prcs_key(v);
+		return V_OK;
 	}
 
 	return V_ERR;
@@ -137,16 +141,7 @@ static int v_insert_mode_input(struct v_state *v, int key)
 
 	switch (key) {
 	case CTRL('['):
-		/*
-		 * ESC or Ctrl-[: Switch into Command Mode
-		 *
-		 * Unfortunately, there will be a slight delay of 1 second if
-		 * the ESC key is pressed. This is due to the fact that I
-		 * enabled the keypad() function for the editor when the
-		 * terminal is being initialized into curses mode and I don't
-		 * have any plan of changing it in the future. Like, I use
-		 * keypad keys a lot, so don't question me here.
-		 */
+		/* ESC or Ctrl-[: Switch into Command Mode */
 		v->v_mode = V_CMD;
 		v_set_stats_msg(v, "");
 		return V_OK;
@@ -160,7 +155,8 @@ static int v_insert_mode_input(struct v_state *v, int key)
 		v_del_char(v);
 		return V_OK;
 	case CTRL('l'):
-		/* Will not be handled */
+		/* Ctrl-L: Force refresh the editor screen */
+		v_prcs_key(v);
 		return V_OK;
 	}
 
