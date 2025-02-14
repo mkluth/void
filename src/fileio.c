@@ -9,6 +9,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include <errno.h>
 
 #include <void.h>
@@ -36,7 +37,7 @@ int v_open(struct v_state *v, char *filename)
 	while ((len = getline(&s, &cap, fp)) != -1) {
 		while (len > 0 && (s[len - 1] == '\n' || s[len - 1] == '\r'))
 			len--;
-		if (v_append_row(v, s, len) == -1)
+		if (v_append_row(v, s, len) == V_ERR)
 			goto error;
 	}
 
@@ -114,14 +115,14 @@ int v_save_file(struct v_state *v)
 	close(fd);
 	free(content);
 	content = NULL;
-	v->v_unsaved = V_FALSE;
+	v->v_unsaved = false;
 
 	v_set_stats_msg(v, "%dL %dB written out to disk", v->nrows, len);
 
 	return V_OK;
 
 cleanup:
-	if (fd != - 1)
+	if (fd != -1)
 		close(fd);
 	free(content);
 	content = NULL;

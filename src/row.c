@@ -40,18 +40,18 @@ static int v_render_row(struct v_row *row)
  *
  * Description:
  * Returns the newly updated number of rows upon successful completion.
- * Otherwise, -1 shall be returned instead. To easily free all of the memories
+ * Otherwise, V_ERR shall be returned instead. To easily free all of the memories
  * associated with the v->rows array, checkout v_free_rows().
  */
 int v_append_row(struct v_state *v, char *s, int len)
 {
 	if (!v || !s || len < 0)
-		return -1;
+		return V_ERR;
 
 	struct v_row *tmp = realloc(v->rows,
 			sizeof(struct v_row) * (v->nrows + 1));
 	if (!tmp)
-		return -1;
+		return V_ERR;
 
 	v->rows = tmp;
 	tmp = NULL;
@@ -59,7 +59,7 @@ int v_append_row(struct v_state *v, char *s, int len)
 	row->len = len;
 	row->orig = malloc(len + 1);
 	if (!row->orig)
-		return -1;
+		return V_ERR;
 
 	memcpy(row->orig, s, len);
 	row->orig[len] = '\0';
@@ -114,7 +114,7 @@ int v_free_rows(struct v_state *v)
  * c: the char to be inserted
  *
  * Description:
- * Returns the newly updated length of the v_row's original string. -1 shall
+ * Returns the newly updated length of the v_row's original string. V_ERR shall
  * be returned instead if failed. The newly updated original string will
  * rendered automatically before this function exits.
  */
@@ -125,7 +125,7 @@ int v_row_insert_char(struct v_row *row, int at, int c)
 
 	char *tmp = realloc(row->orig, row->len + 2);
 	if (!tmp)
-		return -1;
+		return V_ERR;
 
 	row->orig = tmp;
 	memmove(&row->orig[at + 1], &row->orig[at], row->len - at + 1);
@@ -143,7 +143,7 @@ int v_row_insert_char(struct v_row *row, int at, int c)
  *
  * Description:
  * Returns the updated length of the v_row's original string upon successful
- * completion. -1 shall be returned otherwise. The newly updated original string
+ * completion. V_ERR shall be returned otherwise. The newly updated original string
  * will be rendered automatically before this function exits. Do note that the
  * deletion of the character will only take place on the character which located
  * on the leftside of the cursor.
@@ -151,7 +151,7 @@ int v_row_insert_char(struct v_row *row, int at, int c)
 int v_row_del_char(struct v_row *row, int at)
 {
 	if (at < 0 || at >= row->len)
-		return -1;
+		return V_ERR;
 
 	/*
 	 * We don't actually 'delete' the character, but rather we overlap it

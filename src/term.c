@@ -1,4 +1,5 @@
 #include <ncurses.h>
+#include <stdbool.h>
 
 #include <void.h>
 
@@ -41,14 +42,14 @@ int v_init_colors(struct v_state *v)
 	if (!v->v_win || !has_colors())
 		goto error;
 
-	v->v_colors = V_TRUE;
+	v->v_colors = true;
 	start_color();
 	init_pair(V_BAR, V_BAR_FG, V_BAR_BG);
 
 	return V_OK;
 
 error:
-	v->v_colors = V_FALSE;
+	v->v_colors = false;
 	return V_ERR;
 }
 
@@ -67,7 +68,7 @@ int v_reset_term(struct v_state *v)
 
 	endwin();
 	v->v_win = NULL;
-	v->v_colors = V_FALSE;
+	v->v_colors = false;
 	v->scr_x = 0;
 	v->scr_y = 0;
 	v->cur_x = 0;

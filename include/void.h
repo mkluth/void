@@ -2,6 +2,7 @@
 #define VOID_H
 
 #include <ncurses.h>
+#include <stdbool.h>
 #include <time.h>
 
 #define V_VER		"0.0.1"
@@ -19,9 +20,7 @@
 #define V_FILE_MODE	0644		/* Default text files permission */
 
 #define V_OK		0		/* Return value success */
-#define V_ERR		1		/* Return value failure */
-#define V_TRUE		1		/* Boolean value for True */
-#define V_FALSE		0		/* Boolean value for False */
+#define V_ERR		-1		/* Return value failure */
 #define V_CMD		1		/* Command mode value */
 #define V_INSERT	2		/* Insert mode value */
 #define CTRL(c)		((c) & 0x1f)	/* Represent a Ctrl key */
@@ -76,13 +75,13 @@ struct v_state {
 	int rcur_x;
 	int rowoff;
 	int coloff;
-	int v_colors;
+	bool v_colors;
 	char *filename;
 	char stats_msg[V_STATS_MSG_BUF];
 	time_t stats_msg_time;
-	int v_unsaved;
+	bool v_unsaved;
 	int v_mode;
-	int v_run;
+	bool v_run;
 };
 
 /* src/state.c */

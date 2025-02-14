@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <ncurses.h>
+#include <stdbool.h>
 
 #include <void.h>
 
@@ -102,7 +103,7 @@ static void v_exit(struct v_state *v)
 		}
 	}
 
-	v->v_run = V_FALSE;
+	v->v_run = false;
 }
 
 static int v_cmd_mode_input(struct v_state *v, int key)
@@ -160,7 +161,7 @@ static int v_insert_mode_input(struct v_state *v, int key)
 		return V_OK;
 	}
 
-	if (v_insert_char(v, key) != -1)
+	if (v_insert_char(v, key) != V_ERR)
 		return V_OK;
 
 	return V_ERR;

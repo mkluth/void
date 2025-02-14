@@ -96,7 +96,7 @@ static int v_draw_bar(struct v_state *v)
 static int v_render_cur_x(struct v_row *row, int cur_x)
 {
 	if (!row || !row->orig || cur_x < 0)
-		return -1;
+		return V_ERR;
 
 	int x_pos = 0;
 	for (int i = 0; i < cur_x; i++) {
@@ -135,7 +135,7 @@ static int v_scroll(struct v_state *v)
  * fmt: formatted string
  *
  * Description:
- * Returns the length of the formatted string if success, otherwise -1 shall
+ * Returns the length of the formatted string if success, otherwise V_ERR shall
  * be returned instead. This function is variadic. It can takes any number of
  * arguments just like printf() do. This function will saves the formatted
  * string into v->stats_msg. The maximum buffer of v->stats_msg depending on
@@ -147,13 +147,13 @@ static int v_scroll(struct v_state *v)
 int v_set_stats_msg(struct v_state *v, const char *fmt, ...)
 {
 	if (!v)
-		return -1;
+		return V_ERR;
 
 	va_list ap;
 	va_start(ap, fmt);
 	int len = vsnprintf(v->stats_msg, sizeof(v->stats_msg), fmt, ap);
 	if (len < 0)
-		return -1;
+		return V_ERR;
 
 	va_end(ap);
 	v->stats_msg_time = time(NULL);
