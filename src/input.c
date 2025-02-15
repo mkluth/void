@@ -48,7 +48,7 @@ static void v_page_key(struct v_state *v, int key)
 		v_cur_move(v, key == KEY_PPAGE ? CUR_UP : CUR_DOWN);
 }
 
-static int v_navigate_key(struct v_state *v, int key)
+static int v_nav_key(struct v_state *v, int key)
 {
 	struct v_row *row = (v->cur_y >= v->nrows) ? NULL : &v->rows[v->cur_y];
 
@@ -93,22 +93,27 @@ static int v_navigate_key(struct v_state *v, int key)
 
 static void v_exit(struct v_state *v)
 {
-	if (v->v_unsaved) {
-		v_set_stats_msg(v,
-			"WARNING: Unsaved changes. Press Ctrl-Q again to confirm.");
-		v_rfsh_scr(v);
-		if (getch() != CTRL('q')) {
-			v_set_stats_msg(v, "");
-			return;
-		}
+	if (v->v_unsaved)
+		goto confirm_exit;
+
+	v->v_run = false;
+
+	return;
+
+confirm_exit:
+	v_set_stats_msg(v, "WARNING: Unsaved changes. Press Ctrl-Q again to confirm.");
+	v_rfsh_scr(v);
+	if (getch() != CTRL('q')) {
+		v_set_stats_msg(v, "");
+		return;
 	}
 
 	v->v_run = false;
 }
 
-static int v_cmd_mode_input(struct v_state *v, int key)
+static int v_cmd_input(struct v_state *v, int key)
 {
-	if (v_cur_move(v, key) == V_OK || v_navigate_key(v, key) == V_OK)
+	if (v_cur_move(v, key) == V_OK || v_nav_key(v, key) == V_OK)
 		return V_OK;
 
 	switch (key) {
@@ -135,9 +140,9 @@ static int v_cmd_mode_input(struct v_state *v, int key)
 	return V_ERR;
 }
 
-static int v_insert_mode_input(struct v_state *v, int key)
+static int v_insert_input(struct v_state *v, int key)
 {
-	if (v_navigate_key(v, key) == V_OK)
+	if (v_nav_key(v, key) == V_OK)
 		return V_OK;
 
 	switch (key) {
@@ -179,16 +184,18 @@ static int v_insert_mode_input(struct v_state *v, int key)
 int v_prcs_key(struct v_state *v)
 {
 	if (!v || !v->v_win || v->cur_x < 0 || v->cur_y < 0 || v->scr_x <= 0 ||
-			v->scr_y <= 0)
+	    v->scr_y <= 0)
 		return V_ERR;
 
 	int stats = V_OK;
 	int key = getch();
 
 	if (v->v_mode == V_CMD)
-		stats = v_cmd_mode_input(v, key);
+		stats = v_cmd_input(v, key);
+	else if (v->v_mode == V_INSERT)
+		stats = v_insert_input(v, key);
 	else
-		stats = v_insert_mode_input(v, key);
+		stats = V_ERR;
 
 	return stats;
 }

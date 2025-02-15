@@ -5,7 +5,7 @@
 
 #include <void.h>
 
-static int v_draw_y(struct v_state *v, int y)
+static void v_draw_y(struct v_state *v, int y)
 {
 	int filerow = v->rowoff + y;
 	if (filerow < v->nrows) {
@@ -19,7 +19,7 @@ static int v_draw_y(struct v_state *v, int y)
 
 		waddnstr(v->v_win, &row->ren[v->coloff], len);
 
-		return V_OK;
+		return;
 	}
 
 	if (v->nrows == 0 && y == v->scr_y / 3) {
@@ -39,23 +39,19 @@ static int v_draw_y(struct v_state *v, int y)
 
 		waddnstr(v->v_win, V_WC, len);
 
-		return V_OK;
+		return;
 	}
 
 	wprintw(v->v_win, "~\n");
-
-	return V_OK;
 }
 
-static int v_draw_scr_y(struct v_state *v)
+static void v_draw_scr_y(struct v_state *v)
 {
 	for (int y = 0; y < v->scr_y; y++) {
 		wmove(v->v_win, y, 0);
 		v_draw_y(v, y);
 		wclrtoeol(v->v_win);
 	}
-
-	return V_OK;
 }
 
 static int v_draw_bar(struct v_state *v)
@@ -63,9 +59,9 @@ static int v_draw_bar(struct v_state *v)
 	wmove(v->v_win, v->scr_y, 0);
 	char txt[v->scr_x];
 	int len = snprintf(txt, sizeof(txt), "%s %s %d,%d",
-			v->filename ? v->filename : "[No Name]",
-			v->v_unsaved ? "[+]" : "", v->cur_y + 1,
-			v->rcur_x + 1);
+			   v->filename ? v->filename : "[No Name]",
+			   v->v_unsaved ? "[+]" : "", v->cur_y + 1,
+			   v->rcur_x + 1);
 	if (len < 0)
 		return V_ERR;
 
@@ -108,7 +104,7 @@ static int v_render_cur_x(struct v_row *row, int cur_x)
 	return x_pos;
 }
 
-static int v_scroll(struct v_state *v)
+static void v_scroll(struct v_state *v)
 {
 	v->rcur_x = 0;
 	if (v->cur_y < v->nrows)
@@ -125,8 +121,6 @@ static int v_scroll(struct v_state *v)
 
 	if (v->rcur_x >= v->coloff + v->scr_x)
 		v->coloff = v->rcur_x - v->scr_x + 1;
-
-	return V_OK;
 }
 
 /*
@@ -161,7 +155,7 @@ int v_set_stats_msg(struct v_state *v, const char *fmt, ...)
 	return len;
 }
 
-static int v_draw_msg_bar(struct v_state *v)
+static void v_draw_msg_bar(struct v_state *v)
 {
 	wclrtoeol(v->v_win);
 	int msg_len =  strlen(v->stats_msg);
@@ -171,8 +165,6 @@ static int v_draw_msg_bar(struct v_state *v)
 
 	if (msg_len)
 		waddnstr(v->v_win, v->stats_msg, msg_len);
-
-	return V_OK;
 }
 
 /*
@@ -186,8 +178,8 @@ static int v_draw_msg_bar(struct v_state *v)
 int v_rfsh_scr(struct v_state *v)
 {
 	if (!v || !v->v_win || v->cur_x < 0 || v->cur_y < 0 ||
-			v->rowoff < 0 || v->coloff < 0 || v->scr_y <= 0 ||
-			v->scr_x <= 0)
+	    v->rowoff < 0 || v->coloff < 0 || v->scr_y <= 0 ||
+	    v->scr_x <= 0)
 		return V_ERR;
 
 	v_scroll(v);

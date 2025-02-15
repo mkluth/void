@@ -65,6 +65,7 @@ int v_dstr_state(struct v_state *v)
 	v->v_run = false;
 
 	free(v);
+	v = NULL;
 
 	return V_OK;
 }

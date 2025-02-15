@@ -40,8 +40,7 @@ static int v_render_row(struct v_row *row)
  *
  * Description:
  * Returns the newly updated number of rows upon successful completion.
- * Otherwise, V_ERR shall be returned instead. To easily free all of the memories
- * associated with the v->rows array, checkout v_free_rows().
+ * Otherwise, V_ERR shall be returned instead.
  */
 int v_append_row(struct v_state *v, char *s, int len)
 {
@@ -153,10 +152,6 @@ int v_row_del_char(struct v_row *row, int at)
 	if (at < 0 || at >= row->len)
 		return V_ERR;
 
-	/*
-	 * We don't actually 'delete' the character, but rather we overlap it
-	 * with the character that comes after it.
-	 */
 	memmove(&row->orig[at], &row->orig[at + 1], row->len - at);
 	row->len--;
 	v_render_row(row);
