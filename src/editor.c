@@ -29,7 +29,7 @@ int v_insert_char(struct v_state *v, int c)
 		return V_ERR;
 
 	v->cur_x++;
-	v->v_unsaved = true;
+	v->dirty = true;
 
 	return v->cur_x;
 }
@@ -57,7 +57,7 @@ int v_del_char(struct v_state *v)
 		if (v_row_del_char(row, v->cur_x - 1) == V_ERR)
 			return V_ERR;
 		v->cur_x--;
-		v->v_unsaved = true;
+		v->dirty = true;
 	}
 
 	return v->cur_x;

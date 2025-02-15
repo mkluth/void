@@ -102,6 +102,7 @@ int v_free_rows(struct v_state *v)
 	v->rows = NULL;
 	v->rowoff = 0;
 	v->coloff = 0;
+	v->dirty = false;
 
 	return V_OK;
 }

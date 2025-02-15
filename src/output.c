@@ -60,7 +60,7 @@ static int v_draw_bar(struct v_state *v)
 	char txt[v->scr_x];
 	int len = snprintf(txt, sizeof(txt), "%s %s %d,%d",
 			   v->filename ? v->filename : "[No Name]",
-			   v->v_unsaved ? "[+]" : "", v->cur_y + 1,
+			   v->dirty ? "[+]" : "", v->cur_y + 1,
 			   v->rcur_x + 1);
 	if (len < 0)
 		return V_ERR;

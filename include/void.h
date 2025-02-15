@@ -60,7 +60,7 @@ struct v_row {
  * filename: currently opened filename
  * stats_msg: status message string (view V_STATS_MSG_BUF macro)
  * stats_msg_time: timestamp when a status message is setted
- * unsaved: available unsaved changes
+ * dirty: available unsaved changes
  * v_mode: current editor mode
  * v_run: current editor running status
  */
@@ -79,7 +79,7 @@ struct v_state {
 	char *filename;
 	char stats_msg[V_STATS_MSG_BUF];
 	time_t stats_msg_time;
-	bool v_unsaved;
+	bool dirty;
 	int v_mode;
 	bool v_run;
 };
@@ -102,7 +102,7 @@ int v_rfsh_scr(struct v_state *v);
 
 /* src/fileio.c */
 int v_open(struct v_state *v, char *filename);
-int v_save_file(struct v_state *v);
+int v_save(struct v_state *v);
 
 /* src/editor.c */
 int v_insert_char(struct v_state *v, int c);

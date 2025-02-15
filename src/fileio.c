@@ -45,6 +45,7 @@ int v_open(struct v_state *v, char *filename)
 	fp = NULL;
 	free(s);
 	s = NULL;
+	v->dirty = false;
 
 	return V_OK;
 
@@ -53,6 +54,7 @@ error:
 	fp = NULL;
 	free(s);
 	s = NULL;
+	v->dirty = false;
 
 	return V_ERR;
 }
@@ -82,14 +84,14 @@ static char *v_rows_to_str(struct v_state *v, int *buf_len)
 }
 
 /*
- * v_save_file - Save file to disk
+ * v_save - Save file to disk
  * v: pointer to v_state struct
  *
  * Description:
  * Returns V_OK upon successful completion, V_ERR otherwise. The v->rows array
  * shall be converted into one long string before it got written to disk.
  */
-int v_save_file(struct v_state *v)
+int v_save(struct v_state *v)
 {
 	if (!v || !v->filename)
 		return V_ERR;
@@ -115,7 +117,7 @@ int v_save_file(struct v_state *v)
 	close(fd);
 	free(content);
 	content = NULL;
-	v->v_unsaved = false;
+	v->dirty = false;
 
 	v_set_stats_msg(v, "%dL %dB written out to disk", v->nrows, len);
 

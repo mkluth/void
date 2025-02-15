@@ -93,7 +93,7 @@ static int v_nav_key(struct v_state *v, int key)
 
 static void v_exit(struct v_state *v)
 {
-	if (v->v_unsaved)
+	if (v->dirty)
 		goto confirm_exit;
 
 	v->v_run = false;
@@ -129,7 +129,7 @@ static int v_cmd_input(struct v_state *v, int key)
 		return V_OK;
 	case CTRL('s'):
 		/* Ctrl-S: Write out to a file */
-		v_save_file(v);
+		v_save(v);
 		return V_OK;
 	case CTRL('l'):
 		/* Ctrl-L: Force refresh the editor screen */
