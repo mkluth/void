@@ -10,16 +10,13 @@ LIBS := -lncurses
 INCLUDES := -I./src -I./include
 SRCS := $(shell find ./src -name "*.c")
 
-# I'm using LLVM Clang here as the compiler, if you're a fan of GCC, you
-# might want to modify some of the lines below.
-CC := clang
 CFLAGS := -Wall -Wextra $(INCLUDES)
 
 # The default build instruction if you run "make" without argument
 all: obj $(EXE)
 
 $(EXE): obj
-	$(CC) $(LIBS) *.o -o $@
+	$(CC) *.o $(LIBS) -o $@
 	mkdir -p ./obj
 	mv -f *.o ./obj
 
