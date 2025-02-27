@@ -31,7 +31,6 @@ struct v_state *v_new_state(void)
 	v->v_colors = false;
 	v->filename = NULL;
 	memset(v->stats_msg, 0, sizeof(v->stats_msg));
-	v->stats_msg_time = 0;
 	v->dirty = false;
 	v->v_mode = V_CMD;
 	v->v_run = true;
@@ -57,7 +56,6 @@ int v_dstr_state(struct v_state *v)
 
 	v_free_rows(v);
 	memset(v->stats_msg, 0, sizeof(v->stats_msg));
-	v->stats_msg_time = 0;
 	free(v->filename);
 	v->filename = NULL;
 	v->dirty = false;

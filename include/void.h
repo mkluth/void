@@ -3,14 +3,12 @@
 
 #include <ncurses.h>
 #include <stdbool.h>
-#include <time.h>
 
 #define V_VER		"0.0.1"
 #define V_DESC		"A stupid UNIX text editor"
 #define V_WC		"void/Void " V_VER " -- " V_DESC
 
-#define V_STATS_MSG_BUF		100		/* Status message buffer */
-#define V_STATS_MSG_TIMEOUT	5	/* Status message timeout (seconds) */
+#define V_STATS_MSG_BUF		100	/* Status message buffer */
 
 #define V_BAR		1		/* Editor bar color pair number */
 #define V_BAR_FG	COLOR_BLACK	/* Editor bar foreground color */
@@ -59,7 +57,6 @@ struct v_row {
  * v_colors: colors support flag
  * filename: currently opened filename
  * stats_msg: status message string (view V_STATS_MSG_BUF macro)
- * stats_msg_time: timestamp when a status message is setted
  * dirty: available unsaved changes
  * v_mode: current editor mode
  * v_run: current editor running status
@@ -78,7 +75,6 @@ struct v_state {
 	bool v_colors;
 	char *filename;
 	char stats_msg[V_STATS_MSG_BUF];
-	time_t stats_msg_time;
 	bool dirty;
 	int v_mode;
 	bool v_run;

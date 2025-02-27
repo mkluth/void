@@ -1,7 +1,6 @@
 #include <ncurses.h>
 #include <string.h>
 #include <stdarg.h>
-#include <time.h>
 
 #include <void.h>
 
@@ -129,10 +128,7 @@ static void v_scroll(struct v_state *v)
  * be returned instead. This function is variadic. It can takes any number of
  * arguments just like printf() do. This function will saves the formatted
  * string into v->stats_msg. The maximum buffer of v->stats_msg depending on
- * the value of V_STATS_MSG_BUF macro. Do note that a status message will not
- * permanently displayed, it will get erased once the timestamp of the message
- * exceeded the value of V_STATS_MSG_TIMEOUT seconds. The higher the value
- * of V_STATS_MSG_TIMEOUT is, the longer the time the message will be displayed.
+ * the value of V_STATS_MSG_BUF macro.
  */
 int v_set_stats_msg(struct v_state *v, const char *fmt, ...)
 {
@@ -142,11 +138,10 @@ int v_set_stats_msg(struct v_state *v, const char *fmt, ...)
 	va_list ap;
 	va_start(ap, fmt);
 	int len = vsnprintf(v->stats_msg, sizeof(v->stats_msg), fmt, ap);
+	va_end(ap);
+
 	if (len < 0)
 		return V_ERR;
-
-	va_end(ap);
-	v->stats_msg_time = time(NULL);
 
 	return len;
 }
