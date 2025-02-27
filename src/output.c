@@ -70,8 +70,6 @@ static int v_draw_bar(struct v_state *v)
 
 	if (v->v_colors)
 		wattron(v->v_win, COLOR_PAIR(V_BAR));
-	else
-		wattron(v->v_win, A_BOLD);
 
 	waddnstr(v->v_win, txt, len);
 	while (len < v->scr_x) {
@@ -81,8 +79,6 @@ static int v_draw_bar(struct v_state *v)
 
 	if (v->v_colors)
 		wattroff(v->v_win, A_BOLD | COLOR_PAIR(V_BAR));
-	else
-		wattroff(v->v_win, A_BOLD);
 
 	wprintw(v->v_win, "\r\n");
 

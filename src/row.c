@@ -143,10 +143,10 @@ int v_row_insert_char(struct v_row *row, int at, int c)
  *
  * Description:
  * Returns the updated length of the v_row's original string upon successful
- * completion. V_ERR shall be returned otherwise. The newly updated original string
- * will be rendered automatically before this function exits. Do note that the
- * deletion of the character will only take place on the character which located
- * on the leftside of the cursor.
+ * completion. V_ERR shall be returned otherwise. The newly updated original
+ * string will be rendered automatically before this function exits. Do note
+ * that the deletion of the character will only take place on the character
+ * which located on the leftside of the cursor.
  */
 int v_row_del_char(struct v_row *row, int at)
 {

@@ -101,7 +101,7 @@ static void v_exit(struct v_state *v)
 	return;
 
 confirm_exit:
-	v_set_stats_msg(v, "WARNING: Unsaved changes. Press Ctrl-Q again to confirm.");
+	v_set_stats_msg(v, "WARNING: Unsaved changes. Press again to confirm.");
 	v_rfsh_scr(v);
 	if (getch() != CTRL('q')) {
 		v_set_stats_msg(v, "");
