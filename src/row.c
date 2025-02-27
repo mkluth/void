@@ -40,7 +40,12 @@ static int v_render_row(struct v_row *row)
  *
  * Description:
  * Returns the newly updated number of rows upon successful completion.
- * Otherwise, V_ERR shall be returned instead.
+ * Otherwise, V_ERR shall be returned instead. Do note that by calling this
+ * function, v->dirty flag will be setted to true automatically because this
+ * function had completely no idea of what you're trying to achieve when it
+ * comes to appending a brand new v_row. It would just assume that the user
+ * wanted to add a new line for editing purposes, so it flicks on the v->dirty
+ * flag.
  */
 int v_append_row(struct v_state *v, char *s, int len)
 {
@@ -69,6 +74,7 @@ int v_append_row(struct v_state *v, char *s, int len)
 
 	v->nrows++;
 	row = NULL;
+	v->dirty = true;
 
 	return v->nrows;
 }
@@ -79,8 +85,9 @@ int v_append_row(struct v_state *v, char *s, int len)
  *
  * Description:
  * Returns V_OK upon successful completion. Otherwise, V_ERR shall be returned
- * instead. This function will deallocate all of the related v_row allocated
- * memory inside a v_state, especially on the v->rows array.
+ * instead. This function will deallocates all of the related v_row allocated
+ * memory inside a v_state, especially on the v->rows array. v->dirty flag shall
+ * be setted to false.
  */
 int v_free_rows(struct v_state *v)
 {
@@ -116,9 +123,10 @@ int v_free_rows(struct v_state *v)
  * Description:
  * Returns the newly updated length of the v_row's original string. V_ERR shall
  * be returned instead if failed. The newly updated original string will
- * rendered automatically before this function exits.
+ * rendered automatically before this function exits. Do note that when calling
+ * this function, the v->dirty flag will be setted to true automatically.
  */
-int v_row_insert_char(struct v_row *row, int at, int c)
+int v_row_insert_char(struct v_state *v, struct v_row *row, int at, int c)
 {
 	if (at < 0 || at > row->len)
 		at = row->len;
@@ -132,6 +140,7 @@ int v_row_insert_char(struct v_row *row, int at, int c)
 	row->len++;
 	row->orig[at] = c;
 	v_render_row(row);
+	v->dirty = true;
 
 	return row->len;
 }
@@ -146,9 +155,10 @@ int v_row_insert_char(struct v_row *row, int at, int c)
  * completion. V_ERR shall be returned otherwise. The newly updated original
  * string will be rendered automatically before this function exits. Do note
  * that the deletion of the character will only take place on the character
- * which located on the leftside of the cursor.
+ * which located on the leftside of the cursor. Do note that when calling
+ * this function, the v->dirty flag will be setted to true automatically.
  */
-int v_row_del_char(struct v_row *row, int at)
+int v_row_del_char(struct v_state *v, struct v_row *row, int at)
 {
 	if (at < 0 || at >= row->len)
 		return V_ERR;
@@ -156,6 +166,7 @@ int v_row_del_char(struct v_row *row, int at)
 	memmove(&row->orig[at], &row->orig[at + 1], row->len - at);
 	row->len--;
 	v_render_row(row);
+	v->dirty = true;
 
 	return row->len;
 }

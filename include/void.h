@@ -107,7 +107,7 @@ int v_del_char(struct v_state *v);
 /* src/row.c */
 int v_append_row(struct v_state *v, char *s, int len);
 int v_free_rows(struct v_state *v);
-int v_row_insert_char(struct v_row *row, int at, int c);
-int v_row_del_char(struct v_row *row, int at);
+int v_row_insert_char(struct v_state *v, struct v_row *row, int at, int c);
+int v_row_del_char(struct v_state *v, struct v_row *row, int at);
 
 #endif	/* VOID_H */

@@ -127,6 +127,15 @@ static int v_cmd_input(struct v_state *v, int key)
 		v->v_mode = V_INSERT;
 		v_set_stats_msg(v, "-- INSERT --");
 		return V_OK;
+	case 'x':
+	case 'X':
+	case KEY_DC:
+		/*
+		 * x or X or DELETE:
+		 * Delete the character at the cursor's position
+		 */
+		v_row_del_char(v, &v->rows[v->cur_y], v->cur_x);
+		return V_OK;
 	case CTRL('s'):
 		/* Ctrl-S: Write out to a file */
 		v_save(v);
@@ -159,6 +168,10 @@ static int v_insert_input(struct v_state *v, int key)
 	case CTRL('h'):
 		/* BACKSPACE or Ctrl-H: Delete a character on the leftside */
 		v_del_char(v);
+		return V_OK;
+	case KEY_DC:
+		/* DELETE: Delete the character at the cursor's position */
+		v_row_del_char(v, &v->rows[v->cur_y], v->cur_x);
 		return V_OK;
 	case CTRL('l'):
 		/* Ctrl-L: Force refresh the editor screen */

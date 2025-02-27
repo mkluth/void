@@ -128,6 +128,7 @@ cleanup:
 		close(fd);
 	free(content);
 	content = NULL;
+	v->dirty = true;
 
 	v_set_stats_msg(v, "ERR: %s", strerror(errno));
 
