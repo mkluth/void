@@ -79,6 +79,42 @@ int v_append_row(struct v_state *v, char *s, int len)
 	return v->nrows;
 }
 
+/**
+ * v_del_row - delete a v_row struct from a v_state rows array
+ * v: Pointer to the targeted v_state struct.
+ * y: The index of the targeted v_row struct inside v->rows.
+ *
+ * Deletes the specified v_row struct from the targeted v_state's rows
+ * array. This function shall free() the allocated memories of the specified
+ * v_row and sets them to NULL. The length of the v_row strings also will be
+ * setted to 0. The entire v->rows array shall be move, overlapping the deleted
+ * one. The editor dirty flag also will be flicked to true.
+ *
+ * Returns the newly updated number of v->nrows on success, V_ERR otherwise.
+ */
+int v_del_row(struct v_state *v, int y)
+{
+	if (!v || !v->rows || y < 0 || y >= v->nrows)
+		return V_ERR;
+
+	struct v_row *row = &v->rows[y];
+	free(row->orig);
+	free(row->ren);
+
+	row->orig = NULL;
+	row->ren = NULL;
+	row->len = 0;
+	row->rlen = 0;
+
+	memmove(row, &v->rows[y + 1],
+		sizeof(struct v_row) * (v->nrows - y - 1));
+
+	v->nrows--;
+	v->dirty = true;
+
+	return v->nrows;
+}
+
 /*
  * v_free_rows - Free v_row allocated memory inside the specified v_state
  * v: pointer to v_state struct
@@ -140,6 +176,47 @@ int v_row_insert_char(struct v_state *v, struct v_row *row, int at, int c)
 	row->len++;
 	row->orig[at] = c;
 	v_render_row(row);
+	v->dirty = true;
+
+	return row->len;
+}
+
+/**
+ * v_row_append_str - append a string to the end of a v_row struct string
+ * v: Pointer to the targeted v_state struct.
+ * y: The index of the v_row struct to be appended to.
+ * s: String to appended with.
+ * len: The length of string s.
+ *
+ * Append a string to the end of a v_row struct string. Used primarily for the
+ * purpose of joining two v_row strings together into one. The common use
+ * example would be backspacing at the beginning of a line. This is just the
+ * common use case of this function, feel free to use it whenever needed. In
+ * the end this function simply append the string s to the specified v_row's
+ * original string before rendering them and that's all it does.
+ *
+ * Returns the new length of the original updated string on success, V_ERR
+ * otherwise.
+ */
+int v_row_append_str(struct v_state *v, int y, char *s, size_t len)
+{
+	if (!v || !v->rows)
+		return V_ERR;
+
+	struct v_row *row = &v->rows[y];
+
+	char *tmp = realloc(row->orig, row->len + len + 1);
+	if (!tmp)
+		return V_ERR;
+
+	row->orig = tmp;
+	memcpy(&row->orig[row->len], s, len);
+	row->len += len;
+	row->orig[row->len] = '\0';
+
+	if (v_render_row(row) == V_ERR)
+		return V_ERR;
+
 	v->dirty = true;
 
 	return row->len;

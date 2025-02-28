@@ -142,7 +142,7 @@ static int v_cmd_input(struct v_state *v, int key)
 		return V_OK;
 	case CTRL('l'):
 		/* Ctrl-L: Force refresh the editor screen */
-		v_prcs_key(v);
+		v_rfsh_scr(v);
 		return V_OK;
 	}
 
@@ -167,7 +167,7 @@ static int v_insert_input(struct v_state *v, int key)
 	case KEY_BACKSPACE:
 	case CTRL('h'):
 		/* BACKSPACE or Ctrl-H: Delete a character on the leftside */
-		v_del_char(v);
+		v_backspace(v);
 		return V_OK;
 	case KEY_DC:
 		/* DELETE: Delete the character at the cursor's position */
@@ -175,7 +175,7 @@ static int v_insert_input(struct v_state *v, int key)
 		return V_OK;
 	case CTRL('l'):
 		/* Ctrl-L: Force refresh the editor screen */
-		v_prcs_key(v);
+		v_rfsh_scr(v);
 		return V_OK;
 	}
 
