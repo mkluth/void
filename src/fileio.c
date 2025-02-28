@@ -15,14 +15,16 @@
 #include <void.h>
 
 /*
- * v_open - Open a file and save its content into the editor buffer
- * v: pointer to v_state struct
- * filename: the filename to be open
+ * v_open - open a file and load its content into the editor buffer
+ * v: Pointer to the targeted v_state struct.
+ * filename: The name of the targeted file.
  *
- * Description:
- * Returns V_OK upon successful completion. Otherwise, V_ERR. The file shall be
- * opened (if exist) before its content being read and saved inside the
- * specified v_state editor buffer.
+ * Open a file and load its content into the editor buffer. For now, this
+ * function only works if the target file already exist. All of the file
+ * content will be saves into v->rows array and ready for any kinds of text
+ * manipulation.
+ *
+ * Returns V_OK on success, V_ERR otherwise.
  */
 int v_open(struct v_state *v, char *filename)
 {
@@ -84,12 +86,20 @@ static char *v_rows_to_str(struct v_state *v, int *buf_len)
 }
 
 /*
- * v_save - Save file to disk
- * v: pointer to v_state struct
+ * v_save - save file to disk
+ * v: Pointer to the targeted v_state struct.
  *
- * Description:
- * Returns V_OK upon successful completion, V_ERR otherwise. The v->rows array
- * shall be converted into one long string before it got written to disk.
+ * Save file to disk. This function will converts the entire file content into
+ * one long ass piece of string. Once converted this function will dumps
+ * everything out into that file and thereby saving it. After the saving part is
+ * done without any errors occured, the editor dirty flag will flicks
+ * automatically to false. Signaling that all changes have been saved. Do note
+ * that, this function is intended to be use while the editor curses window
+ * still on.
+ *
+ * Returns V_OK alongside with a status message saying that the changes have
+ * been written out successfully, an error message will be displays and V_ERR
+ * will be returns otherwise.
  */
 int v_save(struct v_state *v)
 {
