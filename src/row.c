@@ -32,20 +32,21 @@ static int v_render_row(struct v_row *row)
 	return V_OK;
 }
 
-/*
- * v_append_row - Append a new v_row into v_state
- * v: pointer to v_state struct
- * s: string to be appended
- * len: length of string s
+/**
+ * v_append_row - append a new v_row into the specified v_state rows array
+ * v: Pointer to the targeted v_state struct.
+ * s: String to be save.
+ * len: Length of string s.
  *
- * Description:
- * Returns the newly updated number of rows upon successful completion.
- * Otherwise, V_ERR shall be returned instead. Do note that by calling this
- * function, v->dirty flag will be setted to true automatically because this
- * function had completely no idea of what you're trying to achieve when it
- * comes to appending a brand new v_row. It would just assume that the user
- * wanted to add a new line for editing purposes, so it flicks on the v->dirty
- * flag.
+ * Append a brand new v_row struct into the specified v_state rows array.
+ * Do note that by calling this function, v->dirty flag will be setted to
+ * true automatically because this function had completely no idea of what
+ * you're trying to achieve when it comes to appending a brand new v_row. It
+ * would just assume that the user wanted to add a new line for editing
+ * purposes, so it flicks on the v->dirty flag. Make sure the given len is big
+ * enough to store the string s.
+ *
+ * Returns the updated number of v->nrows on success, V_ERR otherwise.
  */
 int v_append_row(struct v_state *v, char *s, int len)
 {
@@ -115,23 +116,26 @@ int v_del_row(struct v_state *v, int y)
 	return v->nrows;
 }
 
-/*
- * v_free_rows - Free v_row allocated memory inside the specified v_state
- * v: pointer to v_state struct
+/**
+ * v_free_rows - free the entire rows array inside the specified v_state
+ * v: Pointer to the targeted v_state struct.
  *
- * Description:
- * Returns V_OK upon successful completion. Otherwise, V_ERR shall be returned
- * instead. This function will deallocates all of the related v_row allocated
- * memory inside a v_state, especially on the v->rows array. v->dirty flag shall
- * be setted to false.
+ * Free the entire rows array inside the specified v_state. v->dirty flag shall
+ * be setted to false. Use this function whenever you find the need to free()
+ * everything.
+ *
+ * Returns V_OK on success, V_ERR otherwise.
  */
 int v_free_rows(struct v_state *v)
 {
-	if (!v || !v->rows || v->nrows < 0)
+	if (!v || !v->rows)
+		return V_OK;
+
+	if (v->nrows < 0)
 		return V_ERR;
 
-	while (v->nrows--) {
-		struct v_row *row = &v->rows[v->nrows];
+	for (int i = 0; i < v->nrows; i++) {
+		struct v_row *row = &v->rows[i];
 		free(row->orig);
 		free(row->ren);
 		row->orig = NULL;
@@ -141,50 +145,50 @@ int v_free_rows(struct v_state *v)
 		row = NULL;
 	}
 
+	v->nrows = 0;
 	free(v->rows);
 	v->rows = NULL;
-	v->rowoff = 0;
-	v->coloff = 0;
 	v->dirty = false;
 
 	return V_OK;
 }
 
-/*
- * v_row_insert_char - Inserts a single char into a v_row at a given position
- * row: pointer to the targeted v_row struct
- * at: index to insert the char into
- * c: the char to be inserted
+/**
+ * v_row_insert_char - insert a char into a v_row at the given position
+ * row: Pointer to the targeted v_row struct.
+ * x: The index to insert the char into.
+ * c: Char to be inserted with.
  *
- * Description:
- * Returns the newly updated length of the v_row's original string. V_ERR shall
- * be returned instead if failed. The newly updated original string will
- * rendered automatically before this function exits. Do note that when calling
- * this function, the v->dirty flag will be setted to true automatically.
+ * Insert a char into a v_row at the given position. This function will
+ * realloc() the memory of the specified v_row string automatically before
+ * the insertion is carried out. All of the characters within the original
+ * string will be moved to create a room for the new character insertion.
+ * The original string then will be rendered automatically. Please take note
+ * that this function will *not* turn on the editor dirty flag.
+ *
+ * Returns newly updated number of row->len on success, V_ERR otherwise.
  */
-int v_row_insert_char(struct v_state *v, struct v_row *row, int at, int c)
+int v_row_insert_char(struct v_row *row, int x, int c)
 {
-	if (at < 0 || at > row->len)
-		at = row->len;
+	if (x < 0 || x > row->len)
+		x = row->len;
 
 	char *tmp = realloc(row->orig, row->len + 2);
 	if (!tmp)
 		return V_ERR;
 
 	row->orig = tmp;
-	memmove(&row->orig[at + 1], &row->orig[at], row->len - at + 1);
+	memmove(&row->orig[x + 1], &row->orig[x], row->len - x + 1);
 	row->len++;
-	row->orig[at] = c;
+	row->orig[x] = c;
 	v_render_row(row);
-	v->dirty = true;
 
 	return row->len;
 }
 
 /**
  * v_row_append_str - append a string to the end of a v_row struct string
- * v: Pointer to the targeted v_state struct.
- * y: The index of the v_row struct to be appended to.
+ * row: Pointer to the targeted v_row struct.
  * s: String to appended with.
  * len: The length of string s.
  *
@@ -193,17 +197,16 @@ int v_row_insert_char(struct v_state *v, struct v_row *row, int at, int c)
  * example would be backspacing at the beginning of a line. This is just the
  * common use case of this function, feel free to use it whenever needed. In
  * the end this function simply append the string s to the specified v_row's
- * original string before rendering them and that's all it does.
+ * original string before rendering them and that's all it does. Please take
+ * note that this function will *not* turn on the editor dirty flag.
  *
  * Returns the new length of the original updated string on success, V_ERR
  * otherwise.
  */
-int v_row_append_str(struct v_state *v, int y, char *s, size_t len)
+int v_row_append_str(struct v_row *row, char *s, size_t len)
 {
-	if (!v || !v->rows)
+	if (!row || !s)
 		return V_ERR;
-
-	struct v_row *row = &v->rows[y];
 
 	char *tmp = realloc(row->orig, row->len + len + 1);
 	if (!tmp)
@@ -217,33 +220,30 @@ int v_row_append_str(struct v_state *v, int y, char *s, size_t len)
 	if (v_render_row(row) == V_ERR)
 		return V_ERR;
 
-	v->dirty = true;
-
 	return row->len;
 }
 
-/*
- * v_row_del_char - Deletes a single char inside v_row at a given position
- * row: pointer to the targeted v_row struct
- * at: index to delete the char at
+/**
+ * v_row_del_char - delete a char inside the specified v_row at a given position
+ * row: Pointer to the targeted v_row struct.
+ * x: Index to delete the char from.
  *
- * Description:
- * Returns the updated length of the v_row's original string upon successful
- * completion. V_ERR shall be returned otherwise. The newly updated original
- * string will be rendered automatically before this function exits. Do note
- * that the deletion of the character will only take place on the character
- * which located on the leftside of the cursor. Do note that when calling
- * this function, the v->dirty flag will be setted to true automatically.
+ * Delete a char inside the specified v_row at a given position. We don't
+ * technically delete the char actually. We simply just move the entire string
+ * so that it overlaps that one character we wanted to delete out. Then, we
+ * simply decrement the original string length and re-render it. Again, please
+ * take note that this function will not *turn* on the editor dirty flag.
+ *
+ * Returns the newly updated value of row->len on success, V_ERR otherwise.
  */
-int v_row_del_char(struct v_state *v, struct v_row *row, int at)
+int v_row_del_char(struct v_row *row, int x)
 {
-	if (at < 0 || at >= row->len)
+	if (x < 0 || x >= row->len)
 		return V_ERR;
 
-	memmove(&row->orig[at], &row->orig[at + 1], row->len - at);
+	memmove(&row->orig[x], &row->orig[x + 1], row->len - x);
 	row->len--;
 	v_render_row(row);
-	v->dirty = true;
 
 	return row->len;
 }

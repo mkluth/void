@@ -25,7 +25,7 @@ obj: $(SRCS)
 
 # The build instruction if you run "make debug"
 debug: objdebug
-	$(CC) $(LIBS) *.o -g -o $(EXE)
+	$(CC) *.o $(LIBS) -g -o $(EXE)
 	mkdir -p ./obj
 	mv -f *.o ./obj
 

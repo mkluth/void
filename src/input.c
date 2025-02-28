@@ -134,7 +134,8 @@ static int v_cmd_input(struct v_state *v, int key)
 		 * x or X or DELETE:
 		 * Delete the character at the cursor's position
 		 */
-		v_row_del_char(v, &v->rows[v->cur_y], v->cur_x);
+		v_row_del_char(&v->rows[v->cur_y], v->cur_x);
+		v->dirty = true;
 		return V_OK;
 	case CTRL('s'):
 		/* Ctrl-S: Write out to a file */
@@ -171,7 +172,8 @@ static int v_insert_input(struct v_state *v, int key)
 		return V_OK;
 	case KEY_DC:
 		/* DELETE: Delete the character at the cursor's position */
-		v_row_del_char(v, &v->rows[v->cur_y], v->cur_x);
+		v_row_del_char(&v->rows[v->cur_y], v->cur_x);
+		v->dirty = true;
 		return V_OK;
 	case CTRL('l'):
 		/* Ctrl-L: Force refresh the editor screen */
@@ -179,7 +181,7 @@ static int v_insert_input(struct v_state *v, int key)
 		return V_OK;
 	}
 
-	if (v_insert_char(v, key) != V_ERR)
+	if (v_insert(v, key) != V_ERR)
 		return V_OK;
 
 	return V_ERR;
