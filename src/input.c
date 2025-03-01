@@ -30,6 +30,7 @@ static int v_cur_move(struct v_state *v, int key)
 			v->cur_y++;
 		break;
 	default:
+		/* Other keys */
 		return V_ERR;
 	}
 
@@ -97,13 +98,12 @@ static void v_exit(struct v_state *v)
 		goto confirm_exit;
 
 	v->v_run = false;
-
 	return;
 
 confirm_exit:
 	v_set_stats_msg(v, "WARNING: Unsaved changes. Press again to confirm.");
 	v_rfsh_scr(v);
-	if (getch() != CTRL('q')) {
+	if (wgetch(v->v_win) != CTRL('q')) {
 		v_set_stats_msg(v, "");
 		return;
 	}
@@ -187,30 +187,39 @@ static int v_insert_input(struct v_state *v, int key)
 	return V_ERR;
 }
 
-/*
- * v_prcs_key - Read a key from the user and process it
- * v: pointer to v_state struct
+/**
+ * v_prcs_key - read a key and process it for the specified v_state
+ * v: Pointer to the targeted v_state struct.
  *
- * Description:
- * Upon successful completion, V_OK shall be returned. Otherwise, V_ERR shall
- * be returned instead. Do note that this function only works in curses mode
- * and in the editor command mode (currently).
+ * Read a key and process it for the specified v_state. The input processing is
+ * done according to the specified v_state current editor mode. Please take note
+ * that the v_state curses window, v->v_win is required as we will only read the
+ * key on that v_state specific curses window rather than on the stdscr one.
+ *
+ * Returns V_OK on success, V_ERR otherwise.
  */
 int v_prcs_key(struct v_state *v)
 {
-	if (!v || !v->v_win || v->cur_x < 0 || v->cur_y < 0 || v->scr_x <= 0 ||
-	    v->scr_y <= 0)
+	if (!v || !v->v_win)
 		return V_ERR;
 
 	int stats = V_OK;
-	int key = getch();
+	int key = wgetch(v->v_win);
 
-	if (v->v_mode == V_CMD)
+	switch (v->v_mode) {
+	case V_CMD:
+		/* Command Mode */
 		stats = v_cmd_input(v, key);
-	else if (v->v_mode == V_INSERT)
+		break;
+	case V_INSERT:
+		/* Insert Mode */
 		stats = v_insert_input(v, key);
-	else
+		break;
+	default:
+		/* Unknown Mode */
 		stats = V_ERR;
+		break;
+	}
 
 	return stats;
 }

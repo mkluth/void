@@ -14,7 +14,7 @@
 
 #include <void.h>
 
-/*
+/**
  * v_open - open a file and load its content into the editor buffer
  * v: Pointer to the targeted v_state struct.
  * filename: The name of the targeted file.
@@ -33,6 +33,9 @@ int v_open(struct v_state *v, char *filename)
 		return V_ERR;
 
 	v->filename = strdup(filename);
+	if (!v->filename)
+		return V_ERR;
+
 	char *s = NULL;
 	size_t cap = 0;
 	ssize_t len = 0;
@@ -85,7 +88,7 @@ static char *v_rows_to_str(struct v_state *v, int *buf_len)
 	return buf;
 }
 
-/*
+/**
  * v_save - save file to disk
  * v: Pointer to the targeted v_state struct.
  *
@@ -134,13 +137,13 @@ int v_save(struct v_state *v)
 	return V_OK;
 
 cleanup:
+	v_set_stats_msg(v, "ERR: %s", strerror(errno));
+
 	if (fd != -1)
 		close(fd);
 	free(content);
 	content = NULL;
 	v->dirty = true;
-
-	v_set_stats_msg(v, "ERR: %s", strerror(errno));
 
 	return V_ERR;
 }
