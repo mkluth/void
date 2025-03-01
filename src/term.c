@@ -3,13 +3,14 @@
 
 #include <void.h>
 
-/*
- * v_init_term - Initialize the terminal into curses mode
- * v: pointer to v_state struct
+/**
+ * v_init_term - initialize the specifed v_state terminal into curses mode
+ * v: Pointer to the targeted v_state struct.
  *
- * Description:
- * Returns V_OK if successful, otherwise V_ERR. Don't forget to call
- * v_reset_term() before exiting the program.
+ * Initialize the specified v_state terminal into curses mode. Don't forget to
+ * call v_reset_term() before exiting the program.
+ *
+ * Returns V_OK on success, otherwise V_ERR.
  */
 int v_init_term(struct v_state *v)
 {
@@ -28,14 +29,16 @@ int v_init_term(struct v_state *v)
 	return V_OK;
 }
 
-/*
- * v_init_colors - Initialize the terminal colors support
- * v: pointer to v_state struct
+/**
+ * v_init_colors - initialize colors support for the specified v_state
+ * v: Pointer to the targeted v_state struct.
  *
- * Description:
- * Returns V_OK if the terminal does support colors manipulation. Otherwise,
- * V_ERR shall be returns. You can only call this function once v_init_term()
- * is called previously.
+ * Initialize colors support for the specified v_state. You can only call this
+ * function once v_init_term() is called previously. This function will sets the
+ * v->v_colors flag to true if the terminal does support colors manipulation and
+ * the editor NCURSES color pairs will be defined after.
+ *
+ * Returns V_OK if the terminal supports colors manipulation, V_ERR otherwise.
  */
 int v_init_colors(struct v_state *v)
 {
@@ -53,13 +56,16 @@ error:
 	return V_ERR;
 }
 
-/*
- * v_reset_term - Reset the terminal back into cooked mode
- * v: pointer to v_state struct
+/**
+ * v_reset_term - reset the specified v_state terminal back into cooked mode
+ * v: Pointer to the targeted v_state struct.
  *
- * Description:
- * Returns V_OK if successful, else V_ERR. This function should be called
- * before exiting the program if v_init_term() is called previously.
+ * Reset the specified v_state terminal back into cooked mode. This function
+ * should be called before exiting the program if v_init_term() is called
+ * previously. All of the attributes related to the curses mode in the specified
+ * v_state struct will erased.
+ *
+ * Returns V_OK on success, V_ERR otherwise.
  */
 int v_reset_term(struct v_state *v)
 {

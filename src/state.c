@@ -5,12 +5,13 @@
 
 #include <void.h>
 
-/*
- * v_new_state - Create a new v_state struct
+/**
+ * v_new_state - create a new v_state struct
  *
- * Description:
- * Returns a pointer to a v_state struct, NULL if failed. The returned pointer
- * must be freed, since it is allocated by malloc().
+ * Create a new v_state struct. The returned struct pointer must be freed, since
+ * it is allocated by malloc(). Check out v_dstr_state() for that.
+ *
+ * Returns a pointer to a v_state struct on success, NULL otherwise.
  */
 struct v_state *v_new_state(void)
 {
@@ -38,13 +39,14 @@ struct v_state *v_new_state(void)
 	return v;
 }
 
-/*
- * v_dstr_state - Destroy the specified v_state struct
- * v: pointer to v_state struct
+/**
+ * v_dstr_state - destroy the specified v_state struct
+ * v: Pointer to the targeted v_state struct.
  *
- * Description:
- * Returns V_OK on success, V_ERR otherwise. The specified v_state struct shall
- * be deallocated.
+ * Destroy the specified v_state struct. The specified v_state struct will be
+ * deallocates by this function.
+ *
+ * Returns V_OK on success, V_ERR otherwise.
  */
 int v_dstr_state(struct v_state *v)
 {

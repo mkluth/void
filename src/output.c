@@ -118,17 +118,17 @@ static void v_scroll(struct v_state *v)
 		v->coloff = v->rcur_x - v->scr_x + 1;
 }
 
-/*
- * v_set_stats_msg - Set the editor status message
- * v: pointer to v_state struct
- * fmt: formatted string
+/**
+ * v_set_stats_msg - set the editor status message for the specified v_state
+ * v: Pointer to the targeted v_state struct.
+ * fmt: The formatted string.
  *
- * Description:
- * Returns the length of the formatted string if success, otherwise V_ERR shall
- * be returned instead. This function is variadic. It can takes any number of
- * arguments just like printf() do. This function will saves the formatted
- * string into v->stats_msg. The maximum buffer of v->stats_msg depending on
- * the value of V_STATS_MSG_BUF macro.
+ * Set the editor status message for the specified v_state. This function is
+ * variadic. It can takes any number of arguments just like printf() do. This
+ * function will saves the formatted string into v->stats_msg. The maximum
+ * buffer of v->stats_msg depends on the value of V_STATS_MSG_BUF macro.
+ *
+ * Returns the length of the status message on success, V_ERR otherwise.
  */
 int v_set_stats_msg(struct v_state *v, const char *fmt, ...)
 {
@@ -158,19 +158,18 @@ static void v_draw_msg_bar(struct v_state *v)
 		waddnstr(v->v_win, v->stats_msg, msg_len);
 }
 
-/*
- * v_rfsh_scr - Refresh the entire editor screen
- * v: pointer to v_state struct
+/**
+ * v_rfsh_scr - refresh the specified v_state editor screen
+ * v: Pointer to the targeted v_state struct.
  *
- * Description:
- * Returns V_OK upon successful completion. Otherwise, V_ERR. Only works in
- * curses mode.
+ * Refresh the specified v_state editor screen. Please take note that this
+ * function only works in curses mode.
+ *
+ * Returns V_OK on success, V_ERR otherwise.
  */
 int v_rfsh_scr(struct v_state *v)
 {
-	if (!v || !v->v_win || v->cur_x < 0 || v->cur_y < 0 ||
-	    v->rowoff < 0 || v->coloff < 0 || v->scr_y <= 0 ||
-	    v->scr_x <= 0)
+	if (!v || !v->v_win)
 		return V_ERR;
 
 	v_scroll(v);
