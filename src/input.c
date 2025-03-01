@@ -11,13 +11,21 @@ static int v_cur_move(struct v_state *v, int key)
 	switch (key) {
 	case CUR_LEFT:
 		/* Cursor left */
-		if (v->cur_x != 0)
+		if (v->cur_x != 0) {
 			v->cur_x--;
+		} else if (v->cur_y > 0) {
+			v->cur_y--;
+			v->cur_x = v->rows[v->cur_y].len;
+		}
 		break;
 	case CUR_RIGHT:
 		/* Cursor right */
-		if (row && v->cur_x < row->len)
+		if (row && v->cur_x < row->len) {
 			v->cur_x++;
+		} else if (row && v->cur_x == row->len) {
+			v->cur_y++;
+			v->cur_x = 0;
+		}
 		break;
 	case CUR_UP:
 		/* Cursor up */
