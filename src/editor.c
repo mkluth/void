@@ -32,7 +32,7 @@ int v_insert(struct v_state *v, int c)
 		return V_ERR;
 
 	if (v->cur_y == v->nrows)
-		if (v_append_row(v, "", 0) == V_ERR)
+		if (v_insert_row(v, v->nrows, "", 0) == V_ERR)
 			return V_ERR;
 
 	if (v_row_insert_char(&v->rows[v->cur_y], v->cur_x, c) == V_ERR)
@@ -42,6 +42,60 @@ int v_insert(struct v_state *v, int c)
 	v->dirty = true;
 
 	return v->cur_x;
+}
+
+/**
+ * v_insert_nl - insert a newline at the targeted v_state
+ * v: Pointer to the targeted v_state struct.
+ *
+ * Insert a newline at the targeted v_state. Unlike v_insert() which focuses on
+ * character insertion, this function focuses on inserting a brand new line into
+ * the editor buffer, v->rows. There are two types of procedures will be done
+ * here:
+ *
+ * 	1) If the cursor located at the beginning of a line, a new blank v_row
+ * 	   struct will be appended into v->rows and that's it.
+ * 	2) If the cursor located in the middle of a line, this function shall
+ * 	   splits it up into two different lines (two v_row structs).
+ *
+ * Please take note that the insertion here is done based on the current value
+ * of the specified v_state's cursor x and y position. The editor dirty flag
+ * will be sets to true automatically before this function exits. The given
+ * v_state's cursor position also will be updated. The brand new inserted line
+ * will also be renders automatically.
+ *
+ * Returns updated value of v->nrows on success, V_ERR otherwise.
+ */
+int v_insert_nl(struct v_state *v)
+{
+	if (!v)
+		return V_ERR;
+
+	if (v->cur_x == 0) {
+		if (v_insert_row(v, v->cur_y, "", 0) == V_ERR)
+			return V_ERR;
+		goto retval;
+	}
+
+	struct v_row *row = &v->rows[v->cur_y];
+	int stats = v_insert_row(v, v->cur_y + 1, &row->orig[v->cur_x],
+				 row->len - v->cur_x);
+	if (stats == V_ERR)
+		return V_ERR;
+
+	row = &v->rows[v->cur_y];
+	row->len = v->cur_x;
+	row->orig[row->len] = '\0';
+	stats = v_render_row(row);
+	if (stats == V_ERR)
+		return V_ERR;
+
+retval:
+	v->dirty = true;
+	v->cur_y++;
+	v->cur_x = 0;
+
+	return v->nrows;
 }
 
 /**

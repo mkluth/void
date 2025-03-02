@@ -42,7 +42,7 @@ int v_open(struct v_state *v, char *filename)
 	while ((len = getline(&s, &cap, fp)) != -1) {
 		while (len > 0 && (s[len - 1] == '\n' || s[len - 1] == '\r'))
 			len--;
-		if (v_append_row(v, s, len) == V_ERR)
+		if (v_insert_row(v, v->nrows, s, len) == V_ERR)
 			goto error;
 	}
 

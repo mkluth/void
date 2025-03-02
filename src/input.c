@@ -169,9 +169,10 @@ static int v_insert_input(struct v_state *v, int key)
 		v->v_mode = V_CMD;
 		v_set_stats_msg(v, "");
 		return V_OK;
-	case '\r':
-	case '\n':
-		/* TODO */
+	case V_KEY_NEWLINE:
+	case V_KEY_RETURN:
+		/* ENTER: Insert a newline */
+		v_insert_nl(v);
 		return V_OK;
 	case KEY_BACKSPACE:
 	case CTRL('h'):

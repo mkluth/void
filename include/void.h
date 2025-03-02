@@ -21,19 +21,21 @@
 #define V_ERR		-1		/* Return value failure */
 #define V_CMD		1		/* Command mode value */
 #define V_INSERT	2		/* Insert mode value */
-#define CTRL(c)		((c) & 0x1f)	/* Represent a Ctrl key */
+#define CTRL(c)		((c) & 0x1f)	/* Represents a Ctrl key */
+#define V_KEY_NEWLINE	10		/* Represents '\n' key */
+#define V_KEY_RETURN	13		/* Represents '\r' key */
 
 #define CUR_LEFT	104		/* Move cursor leftwards */
 #define CUR_UP		107		/* Move cursor upwards */
 #define CUR_DOWN	106		/* Move cursor downwards */
 #define CUR_RIGHT	108		/* Move cursor rightwards */
 
-/*
- * struct v_row - Represent a line of text to be displayed
- * orig: the original string (unrendered)
- * ren: the rendered string
- * len: the original string length (unrendered)
- * rlen: the rendered string length
+/**
+ * struct v_row - represent a line of text to be displayed
+ * orig: The original string (unrendered).
+ * ren: The rendered string.
+ * len: The original string length (unrendered).
+ * rlen: The rendered string length.
  */
 struct v_row {
 	char *orig;
@@ -42,24 +44,24 @@ struct v_row {
 	int rlen;
 };
 
-/*
- * struct v_state - Current thread information
- * v_win: pointer to NCURSES WINDOW struct
- * rows: array of v_row structs
- * nrows: number of available v_row structs
- * scr_x: maximum value of screen x-axis
- * scr_y: maximum value of screen y-axis
- * cur_x: current cursor x-axis
- * cur_y: current cursor y-axis
- * rcur_x: current cursor x-axis (rendered)
- * rowoff: current row offset
- * coloff: current column offset
- * v_colors: colors support flag
- * filename: currently opened filename
- * stats_msg: status message string (view V_STATS_MSG_BUF macro)
- * dirty: available unsaved changes
- * v_mode: current editor mode
- * v_run: current editor running status
+/**
+ * struct v_state - current thread information
+ * v_win: Pointer to NCURSES WINDOW struct.
+ * rows: Array of v_row structs.
+ * nrows: Number of available v_row structs.
+ * scr_x: Maximum value of screen x-axis.
+ * scr_y: Maximum value of screen y-axis.
+ * cur_x: Current cursor x-axis.
+ * cur_y: Current cursor y-axis.
+ * rcur_x: Current cursor x-axis (rendered).
+ * rowoff: Current row offset.
+ * coloff: Current column offset.
+ * v_colors: Colors support flag.
+ * filename: Currently opened filename.
+ * stats_msg: Status message string (view V_STATS_MSG_BUF macro).
+ * dirty: Available unsaved changes.
+ * v_mode: Current editor mode.
+ * v_run: Current editor running status.
  */
 struct v_state {
 	WINDOW *v_win;
@@ -102,10 +104,12 @@ int v_save(struct v_state *v);
 
 /* src/editor.c */
 int v_insert(struct v_state *v, int c);
+int v_insert_nl(struct v_state *v);
 int v_backspace(struct v_state *v);
 
 /* src/row.c */
-int v_append_row(struct v_state *v, char *s, int len);
+int v_render_row(struct v_row *row);
+int v_insert_row(struct v_state *v, int y, char *s, size_t len);
 int v_del_row(struct v_state *v, int y);
 int v_free_rows(struct v_state *v);
 int v_row_insert_char(struct v_row *row, int at, int c);

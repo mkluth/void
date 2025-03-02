@@ -4,7 +4,20 @@
 
 #include <void.h>
 
-static int v_render_row(struct v_row *row)
+/**
+ * v_render_row - render the given v_row struct
+ * row: Pointer to the targeted v_row struct.
+ *
+ * Render the given v_row struct. This function renders the content of the
+ * specified v_row so that it could be displayed nicely on the editor screen.
+ * The rendering for now only focuses on the tab character. Depending on the
+ * value of V_TABSTP macro, a tab character will be rendered to match the
+ * value of it. The rendered string result will be saved inside row->ren
+ * meanwhile the length of the rendered string will be saved inside row->rlen.
+ *
+ * Returns V_OK on success, V_ERR otherwise.
+ */
+int v_render_row(struct v_row *row)
 {
 	int tabs = 0;
 	for (int i = 0; i < row->len; i++)
@@ -33,24 +46,26 @@ static int v_render_row(struct v_row *row)
 }
 
 /**
- * v_append_row - append a new v_row into the specified v_state rows array
+ * v_insert_row - insert a new v_row into the specified v_state rows array
  * v: Pointer to the targeted v_state struct.
+ * y: The insertion index inside v->rows.
  * s: String to be save.
  * len: Length of string s.
  *
- * Append a brand new v_row struct into the specified v_state rows array.
+ * Insert a brand new v_row struct into the specified v_state rows array.
  * Do note that by calling this function, v->dirty flag will be setted to
  * true automatically because this function had completely no idea of what
- * you're trying to achieve when it comes to appending a brand new v_row. It
- * would just assume that the user wanted to add a new line for editing
- * purposes, so it flicks on the v->dirty flag. Make sure the given len is big
- * enough to store the string s.
+ * you're trying to achieve when it comes to inserting a brand new v_row. It
+ * would just assume that you wanted to add a new line for editing purposes,
+ * so it flicks on the v->dirty flag. Make sure the given len is big enough to
+ * store the string s. Insertion in the middle of v->rows array is supported
+ * here.
  *
  * Returns the updated number of v->nrows on success, V_ERR otherwise.
  */
-int v_append_row(struct v_state *v, char *s, int len)
+int v_insert_row(struct v_state *v, int y, char *s, size_t len)
 {
-	if (!v || !s || len < 0)
+	if (!v || !s || y < 0 || y > v->nrows)
 		return V_ERR;
 
 	struct v_row *tmp = realloc(v->rows,
@@ -60,7 +75,11 @@ int v_append_row(struct v_state *v, char *s, int len)
 
 	v->rows = tmp;
 	tmp = NULL;
-	struct v_row *row = &v->rows[v->nrows];
+
+	memmove(&v->rows[y + 1], &v->rows[y],
+		sizeof(struct v_row) * (v->nrows - y));
+
+	struct v_row *row = &v->rows[y];
 	row->len = len;
 	row->orig = malloc(len + 1);
 	if (!row->orig)
@@ -70,7 +89,7 @@ int v_append_row(struct v_state *v, char *s, int len)
 	row->orig[len] = '\0';
 	row->ren = NULL;
 	row->rlen = 0;
-	if (v_render_row(&v->rows[v->nrows]) == V_ERR)
+	if (v_render_row(row) == V_ERR)
 		return V_ERR;
 
 	v->nrows++;
