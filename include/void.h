@@ -9,6 +9,7 @@
 #define V_WC		"void/Void " V_VER " -- " V_DESC
 
 #define V_STATS_MSG_BUF		100	/* Status message buffer */
+#define V_DEFAULT_BUF_SZ	128	/* Default prompt buffer size */
 
 #define V_BAR		1		/* Editor bar color pair number */
 #define V_BAR_FG	COLOR_BLACK	/* Editor bar foreground color */
@@ -22,8 +23,9 @@
 #define V_CMD		1		/* Command mode value */
 #define V_INSERT	2		/* Insert mode value */
 #define CTRL(c)		((c) & 0x1f)	/* Represents a Ctrl key */
-#define V_KEY_NEWLINE	10		/* Represents '\n' key */
-#define V_KEY_RETURN	13		/* Represents '\r' key */
+#define V_KEY_ESC	27		/* Represents an ESC key */
+#define V_KEY_NL	10		/* Represents '\n' key */
+#define V_KEY_RET	13		/* Represents '\r' key */
 
 #define CUR_LEFT	104		/* Move cursor leftwards */
 #define CUR_UP		107		/* Move cursor upwards */
@@ -88,6 +90,7 @@ int v_dstr_state(struct v_state *v);
 
 /* src/input.c */
 int v_prcs_key(struct v_state *v);
+char *v_prompt(struct v_state *v, char *s);
 
 /* src/term.c */
 int v_init_term(struct v_state *v);

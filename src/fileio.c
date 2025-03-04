@@ -106,8 +106,14 @@ static char *v_rows_to_str(struct v_state *v, int *buf_len)
  */
 int v_save(struct v_state *v)
 {
-	if (!v || !v->filename)
+	if (!v)
 		return V_ERR;
+
+	if (!v->filename) {
+		v->filename = v_prompt(v, "Save as: %s");
+		if (!v->filename)
+			return V_ERR;
+	}
 
 	int fd = 0;
 	char *content = NULL;
