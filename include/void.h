@@ -32,6 +32,8 @@
 #define CUR_UP		107		/* Move cursor upwards */
 #define CUR_DOWN	106		/* Move cursor downwards */
 #define CUR_RIGHT	108		/* Move cursor rightwards */
+#define CUR_SOL		48		/* Move cursor to the start of a line */
+#define CUR_EOL		36		/* Move cursor to the end of a line */
 
 /**
  * struct v_row - represent a line of text to be displayed

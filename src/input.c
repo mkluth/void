@@ -39,6 +39,15 @@ static int v_cur_move(struct v_state *v, int key)
 		if (v->cur_y < v->nrows)
 			v->cur_y++;
 		break;
+	case CUR_SOL:
+		/* Jump cursor to the start of a line */
+		v->cur_x = 0;
+		return V_OK;
+	case CUR_EOL:
+		/* Jump cursor to the end of a line */
+		if (row)
+			v->cur_x = row->len;
+		return V_OK;
 	default:
 		/* Other keys */
 		return V_ERR;
@@ -52,54 +61,54 @@ static int v_cur_move(struct v_state *v, int key)
 	return V_OK;
 }
 
-static void v_page_key(struct v_state *v, int key)
-{
-	int times = v->scr_y;
-	while (times--)
-		v_cur_move(v, key == KEY_PPAGE ? CUR_UP : CUR_DOWN);
-}
-
 static int v_nav_key(struct v_state *v, int key)
 {
-	struct v_row *row = (v->cur_y >= v->nrows) ? NULL : &v->rows[v->cur_y];
+	int times = v->scr_y;
 
 	switch (key) {
 	case KEY_LEFT:
-		/* Arrow left */
+		/* Arrow Left */
 		return v_cur_move(v, CUR_LEFT);
 	case KEY_RIGHT:
-		/* Arrow right */
+		/* Arrow Right */
 		return v_cur_move(v, CUR_RIGHT);
 	case KEY_UP:
-		/* Arrow up */
+		/* Arrow Up */
 		return v_cur_move(v, CUR_UP);
 	case KEY_DOWN:
-		/* Arrow down */
+		/* Arrow Down */
 		return v_cur_move(v, CUR_DOWN);
 	case KEY_HOME:
-		/* Home key */
-		v->cur_x = 0;
-		return V_OK;
+		/* Home Key */
+		return v_cur_move(v, CUR_SOL);
 	case KEY_END:
-		/* End key */
-		if (row)
-			v->cur_x = row->len;
-		return V_OK;
+		/* End Key */
+		return v_cur_move(v, CUR_EOL);
 	case KEY_PPAGE:
+	case CTRL('y'):
 		/* Page Up */
 		v->cur_y = v->rowoff;
-		v_page_key(v, key);
-		return V_OK;
+		goto page_up;
 	case KEY_NPAGE:
+	case CTRL('v'):
 		/* Page Down */
 		v->cur_y = v->rowoff + v->scr_x - 1;
 		if (v->cur_y > v->nrows)
 			v->cur_y = v->nrows;
-		v_page_key(v, key);
-		return V_OK;
+		goto page_down;
 	}
 
 	return V_ERR;
+
+page_up:
+	while (times--)
+		v_cur_move(v, CUR_UP);
+	return V_OK;
+
+page_down:
+	while (times--)
+		v_cur_move(v, CUR_DOWN);
+	return V_OK;
 }
 
 static void v_exit(struct v_state *v)
