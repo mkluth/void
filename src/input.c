@@ -177,6 +177,7 @@ static int v_insert_input(struct v_state *v, int key)
 		v_insert_nl(v);
 		return V_OK;
 	case KEY_BACKSPACE:
+	case V_KEY_BKSP:
 	case CTRL('h'):
 		/* BACKSPACE or Ctrl-H: Delete a character on the leftside */
 		v_backspace(v);
@@ -243,19 +244,22 @@ static int get_prompt_input(WINDOW *win, char *buf, size_t *bufsz,
 	switch (c) {
 	case KEY_BACKSPACE:
 	case KEY_DC:
+	case V_KEY_BKSP:
 	case CTRL('h'):
-		goto backspace;
+		if (*buflen != 0)
+			buf[--(*buflen)] = '\0';
+		return V_OK;
 	case V_KEY_ESC:
-		/* Signals the caller to abort the input reading loop */
+		/* Signal the caller to abort the input reading loop */
 		return 1;
 	case V_KEY_NL:
 	case V_KEY_RET:
-		/* Signals the caller to return the buf */
+		/* Signal the caller to return the buf */
 		return 2;
 	}
 
 	if (iscntrl(c) || c > 128)
-		/* Signals the caller that the input given is an invalid key */
+		/* Signal the caller that the input given is an invalid key */
 		return 3;
 
 	if (*buflen == *bufsz - 1) {
@@ -272,11 +276,6 @@ static int get_prompt_input(WINDOW *win, char *buf, size_t *bufsz,
 	(*buflen)++;
 	buf[*buflen] = '\0';
 
-	return V_OK;
-
-backspace:
-	if (*buflen != 0)
-		buf[--(*buflen)] = '\0';
 	return V_OK;
 }
 
@@ -339,7 +338,7 @@ char *v_prompt(struct v_state *v, char *s)
 		 *  		process.
 		 */
 		stats = get_prompt_input(v->v_win, buf, &bufsz, &buflen);
-		if (stats == 1 || stats == 3 || stats == V_ERR)
+		if (stats == 1 || stats == V_ERR)
 			goto stop_prompt;
 
 		if (stats == 2)

@@ -24,8 +24,9 @@
 #define V_INSERT	2		/* Insert mode value */
 #define CTRL(c)		((c) & 0x1f)	/* Represents a Ctrl key */
 #define V_KEY_ESC	27		/* Represents an ESC key */
-#define V_KEY_NL	10		/* Represents '\n' key */
-#define V_KEY_RET	13		/* Represents '\r' key */
+#define V_KEY_NL	10		/* Represents a '\n' key */
+#define V_KEY_RET	13		/* Represents a '\r' key */
+#define V_KEY_BKSP	127		/* Represents a BACKSPACE key */
 
 #define CUR_LEFT	104		/* Move cursor leftwards */
 #define CUR_UP		107		/* Move cursor upwards */
