@@ -16,7 +16,7 @@ static void v_draw_y(struct v_state *v, int y)
 		if (len > v->scr_x)
 			len = v->scr_x;
 
-		waddnstr(v->v_win, &row->ren[v->coloff], len);
+		addnstr(&row->ren[v->coloff], len);
 
 		return;
 	}
@@ -29,33 +29,33 @@ static void v_draw_y(struct v_state *v, int y)
 
 		int padding = (v->scr_x - len) / 2;
 		if (padding) {
-			wprintw(v->v_win, "~");
+			printw("~");
 			padding--;
 		}
 
 		while (padding--)
-			wprintw(v->v_win, " ");
+			printw(" ");
 
-		waddnstr(v->v_win, V_WC, len);
+		addnstr(V_WC, len);
 
 		return;
 	}
 
-	wprintw(v->v_win, "~\n");
+	printw("~\n");
 }
 
 static void v_draw_scr_y(struct v_state *v)
 {
 	for (int y = 0; y < v->scr_y; y++) {
-		wmove(v->v_win, y, 0);
+		move(y, 0);
 		v_draw_y(v, y);
-		wclrtoeol(v->v_win);
+		clrtoeol();
 	}
 }
 
 static int v_draw_bar(struct v_state *v)
 {
-	wmove(v->v_win, v->scr_y, 0);
+	move(v->scr_y, 0);
 	char txt[v->scr_x];
 	int len = snprintf(txt, sizeof(txt), "%s %s %d,%d",
 			   v->filename ? v->filename : "[No Name]",
@@ -67,19 +67,19 @@ static int v_draw_bar(struct v_state *v)
 	if (len > v->scr_x)
 		len = v->scr_x;
 
-	if (v->v_colors)
-		wattron(v->v_win, COLOR_PAIR(V_BAR));
+	if (v->colors)
+		attron(COLOR_PAIR(V_BAR));
 
-	waddnstr(v->v_win, txt, len);
+	addnstr(txt, len);
 	while (len < v->scr_x) {
-		wprintw(v->v_win, " ");
+		printw(" ");
 		len++;
 	}
 
-	if (v->v_colors)
-		wattroff(v->v_win, A_BOLD | COLOR_PAIR(V_BAR));
+	if (v->colors)
+		attroff(A_BOLD | COLOR_PAIR(V_BAR));
 
-	wprintw(v->v_win, "\r\n");
+	printw("\r\n");
 
 	return V_OK;
 }
@@ -148,28 +148,28 @@ int v_set_stats_msg(struct v_state *v, const char *fmt, ...)
 
 static void v_draw_msg_bar(struct v_state *v)
 {
-	wclrtoeol(v->v_win);
+	clrtoeol();
 	int msg_len =  strlen(v->stats_msg);
 
 	if (msg_len > v->scr_x)
 		msg_len = v->scr_x;
 
 	if (msg_len)
-		waddnstr(v->v_win, v->stats_msg, msg_len);
+		addnstr(v->stats_msg, msg_len);
 }
 
 /**
- * v_rfsh_scr - refresh the specified v_state editor screen
+ * v_rfsh_scr - refresh the editor screen using the specified v_state
  * v: Pointer to the targeted v_state struct.
  *
- * Refresh the specified v_state editor screen. Please take note that this
- * function only works in curses mode.
+ * Refresh the editor screen using the specified v_state. Please take note that
+ * this function only works in curses mode.
  *
  * Returns V_OK on success, V_ERR otherwise.
  */
 int v_rfsh_scr(struct v_state *v)
 {
-	if (!v || !v->v_win)
+	if (!v)
 		return V_ERR;
 
 	v_scroll(v);
@@ -177,8 +177,8 @@ int v_rfsh_scr(struct v_state *v)
 	v_draw_scr_y(v);
 	v_draw_bar(v);
 	v_draw_msg_bar(v);
-	wmove(v->v_win, v->cur_y - v->rowoff, v->rcur_x - v->coloff);
-	wrefresh(v->v_win);
+	move(v->cur_y - v->rowoff, v->rcur_x - v->coloff);
+	refresh();
 	curs_set(1);
 
 	return V_OK;

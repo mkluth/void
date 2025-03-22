@@ -14,16 +14,16 @@
  */
 int v_init_term(struct v_state *v)
 {
-	if (!v || v->v_win)
+	if (!v)
 		return V_ERR;
 
-	v->v_win = initscr();
+	initscr();
 	raw();
-	keypad(v->v_win, TRUE);
+	keypad(stdscr, TRUE);
 	noecho();
 	set_escdelay(0);
 
-	getmaxyx(v->v_win, v->scr_y, v->scr_x);
+	getmaxyx(stdscr, v->scr_y, v->scr_x);
 	v->scr_y -= 2;
 
 	return V_OK;
@@ -33,26 +33,26 @@ int v_init_term(struct v_state *v)
  * v_init_colors - initialize colors support for the specified v_state
  * v: Pointer to the targeted v_state struct.
  *
- * Initialize colors support for the specified v_state. You can only call this
+ * Initialize colors support for the specified v_state. You should only call this
  * function once v_init_term() is called previously. This function will sets the
- * v->v_colors flag to true if the terminal does support colors manipulation and
+ * v->colors flag to true if the terminal does support colors manipulation and
  * the editor NCURSES color pairs will be defined after.
  *
  * Returns V_OK if the terminal supports colors manipulation, V_ERR otherwise.
  */
 int v_init_colors(struct v_state *v)
 {
-	if (!v->v_win || !has_colors())
+	if (!has_colors())
 		goto error;
 
-	v->v_colors = true;
+	v->colors = true;
 	start_color();
 	init_pair(V_BAR, V_BAR_FG, V_BAR_BG);
 
 	return V_OK;
 
 error:
-	v->v_colors = false;
+	v->colors = false;
 	return V_ERR;
 }
 
@@ -69,12 +69,11 @@ error:
  */
 int v_reset_term(struct v_state *v)
 {
-	if (!v || !v->v_win)
+	if (!v)
 		return V_ERR;
 
 	endwin();
-	v->v_win = NULL;
-	v->v_colors = false;
+	v->colors = false;
 	v->scr_x = 0;
 	v->scr_y = 0;
 	v->cur_x = 0;

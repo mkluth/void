@@ -28,12 +28,7 @@
 #define V_KEY_RET	13		/* Represents a '\r' key */
 #define V_KEY_BKSP	127		/* Represents a BACKSPACE key */
 
-#define CUR_LEFT	104		/* Move cursor leftwards */
-#define CUR_UP		107		/* Move cursor upwards */
-#define CUR_DOWN	106		/* Move cursor downwards */
-#define CUR_RIGHT	108		/* Move cursor rightwards */
-#define CUR_SOL		48		/* Move cursor to the start of a line */
-#define CUR_EOL		36		/* Move cursor to the end of a line */
+#define V_KEY_QUIT	CTRL('q')	/* Quit the editor */
 
 /**
  * struct v_row - represent a line of text to be displayed
@@ -51,7 +46,6 @@ struct v_row {
 
 /**
  * struct v_state - current thread information
- * v_win: Pointer to NCURSES WINDOW struct.
  * rows: Array of v_row structs.
  * nrows: Number of available v_row structs.
  * scr_x: Maximum value of screen x-axis.
@@ -61,15 +55,14 @@ struct v_row {
  * rcur_x: Current cursor x-axis (rendered).
  * rowoff: Current row offset.
  * coloff: Current column offset.
- * v_colors: Colors support flag.
+ * colors: Colors support flag.
  * filename: Currently opened filename.
  * stats_msg: Status message string (view V_STATS_MSG_BUF macro).
  * dirty: Available unsaved changes.
- * v_mode: Current editor mode.
- * v_run: Current editor running status.
+ * mode: Current editor mode.
+ * run: Current editor running status.
  */
 struct v_state {
-	WINDOW *v_win;
 	struct v_row *rows;
 	int nrows;
 	int scr_x;
@@ -79,12 +72,22 @@ struct v_state {
 	int rcur_x;
 	int rowoff;
 	int coloff;
-	bool v_colors;
+	bool colors;
 	char *filename;
 	char stats_msg[V_STATS_MSG_BUF];
 	bool dirty;
-	int v_mode;
-	bool v_run;
+	int mode;
+	bool run;
+};
+
+/**
+ * struct v_keybind - represent the editor keybinding
+ * key: The registered ASCII key value for the keybinding.
+ * func: Pointer to the execution function once the keybinding is pressed.
+ */
+struct v_keybind {
+	int key;
+	int (*func)(struct v_state *v);
 };
 
 /* src/state.c */

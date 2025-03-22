@@ -19,7 +19,6 @@ struct v_state *v_new_state(void)
 	if (!v)
 		return NULL;
 
-	v->v_win = NULL;
 	v->rows = NULL;
 	v->nrows = 0;
 	v->scr_x = 0;
@@ -29,12 +28,12 @@ struct v_state *v_new_state(void)
 	v->rcur_x = 0;
 	v->rowoff = 0;
 	v->coloff = 0;
-	v->v_colors = false;
+	v->colors = false;
 	v->filename = NULL;
 	memset(v->stats_msg, 0, sizeof(v->stats_msg));
 	v->dirty = false;
-	v->v_mode = V_CMD;
-	v->v_run = true;
+	v->mode = V_CMD;
+	v->run = true;
 
 	return v;
 }
@@ -44,7 +43,8 @@ struct v_state *v_new_state(void)
  * v: Pointer to the targeted v_state struct.
  *
  * Destroy the specified v_state struct. The specified v_state struct will be
- * deallocates by this function.
+ * deallocates by this function. Do note that this function will automatically
+ * calls v_reset_term().
  *
  * Returns V_OK on success, V_ERR otherwise.
  */
@@ -53,16 +53,14 @@ int v_dstr_state(struct v_state *v)
 	if (!v)
 		return V_ERR;
 
-	if (v->v_win)
-		v_reset_term(v);
-
+	v_reset_term(v);
 	v_free_rows(v);
 	memset(v->stats_msg, 0, sizeof(v->stats_msg));
 	free(v->filename);
 	v->filename = NULL;
 	v->dirty = false;
-	v->v_mode = V_CMD;
-	v->v_run = false;
+	v->mode = V_CMD;
+	v->run = false;
 
 	free(v);
 	v = NULL;

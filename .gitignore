@@ -53,3 +53,6 @@ dkms.conf
 
 # Compiled binary
 void
+
+# Log files
+*.log
