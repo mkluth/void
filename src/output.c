@@ -56,25 +56,32 @@ static void v_draw_scr_y(struct v_state *v)
 static int v_draw_bar(struct v_state *v)
 {
 	move(v->scr_y, 0);
-	char txt[v->scr_x];
-	int len = snprintf(txt, sizeof(txt), "%s %s %d,%d",
-			   v->filename ? v->filename : "[No Name]",
-			   v->dirty ? "[+]" : "", v->cur_y + 1,
-			   v->rcur_x + 1);
-	if (len < 0)
+	char left[V_STATS_LEFT_MAX], right[V_STATS_RIGHT_MAX];
+	int left_len = snprintf(left, sizeof(left), "%.20s %s",
+			       v->filename ? v->filename : "[No Name]",
+			       v->dirty ? "[+]" : "");
+
+	int right_len = snprintf(right, sizeof(right), "%d,%d   ",
+				v->cur_y + 1,
+				v->rcur_x + 1);
+
+	if (left_len < 0 || right_len < 0)
 		return V_ERR;
 
-	if (len > v->scr_x)
-		len = v->scr_x;
+	if (left_len + right_len > v->scr_x) {
+		left_len = v->scr_x - right_len;
+		if (left_len < 0)
+			left_len = 0;
+	}
 
 	if (v->colors)
 		attron(COLOR_PAIR(V_BAR));
 
-	addnstr(txt, len);
-	while (len < v->scr_x) {
+	addnstr(left, left_len);
+	for (int i = left_len; i < v->scr_x - right_len; i++)
 		printw(" ");
-		len++;
-	}
+
+	addnstr(right, right_len);
 
 	if (v->colors)
 		attroff(A_BOLD | COLOR_PAIR(V_BAR));
