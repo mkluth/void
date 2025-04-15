@@ -30,14 +30,6 @@
 #define V_KEY_RET	13		/* Represents a '\r' key */
 #define V_KEY_BKSP	127		/* Represents a BACKSPACE key */
 
-#define V_CUR_LEFT	104		/* Move cursor left */
-#define V_CUR_RGHT	108		/* Move cursor right */
-#define V_CUR_UP	107		/* Move cursor up */
-#define V_CUR_DOWN	106		/* Move cursor down */
-#define V_CUR_SOL	48		/* Jump to the start of a line */
-#define V_CUR_EOL	36		/* Jump to the start of a line */
-#define V_CTRL_QUIT	CTRL('q')	/* Quit the editor */
-
 /**
  * struct v_row - represent a line of text to be displayed
  * orig: The original string (unrendered).

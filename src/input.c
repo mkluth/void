@@ -9,27 +9,21 @@
 static int v_nav(struct v_state *v, int key)
 {
 	switch (key) {
-	case V_CUR_LEFT:
 	case KEY_LEFT:
 		/* Cursor left */
 		return v_cur_left(v);
-	case V_CUR_RGHT:
 	case KEY_RIGHT:
 		/* Cursor right */
 		return v_cur_right(v);
-	case V_CUR_UP:
 	case KEY_UP:
 		/* Cursor up */
 		return v_cur_up(v);
-	case V_CUR_DOWN:
 	case KEY_DOWN:
 		/* Cursor down */
 		return v_cur_down(v);
-	case V_CUR_SOL:
 	case KEY_HOME:
 		/* Jump to the start of the line */
 		return v_cur_bol(v);
-	case V_CUR_EOL:
 	case KEY_END:
 		/* Jump to the end of the line */
 		return v_cur_eol(v);
@@ -44,6 +38,8 @@ static int v_nav(struct v_state *v, int key)
 	return V_ERR;
 }
 
+/* === Command Mode related === */
+
 static int v_quit(struct v_state *v)
 {
 	if (!v->dirty)
@@ -52,7 +48,7 @@ static int v_quit(struct v_state *v)
 	v_set_stats_msg(v, "WARNING: Unsaved changes. Press again to quit.");
 	v_rfsh_scr(v);
 	int key = getch();
-	if (key != V_CTRL_QUIT)
+	if (key != CTRL('q'))
 		return V_ERR;
 
 quit:
@@ -60,19 +56,67 @@ quit:
 	return V_OK;
 }
 
-static const struct v_key ctrls[] = {
-	{V_CTRL_QUIT, v_quit},		/* Quit the editor */
-	{0, NULL}			/* Sentinel */
+static int v_switch_insert(struct v_state *v)
+{
+	v->mode = V_INSERT;
+	v_set_stats_msg(v, "-- INSERT --");
+	return V_OK;
+}
+
+static const struct v_key cmd_keys[] = {
+	{CTRL('q'), v_quit},	/* Quit the editor */
+	{'$', v_cur_eol},	/* Jump to EOL */
+	{'0', v_cur_bol},	/* Jump to BOL */
+	{'h', v_cur_left},	/* Move cursor left */
+	{'i', v_switch_insert},	/* Switch into Insert Mode */
+	{'j', v_cur_down},	/* Move cursor down */
+	{'k', v_cur_up},	/* Move cursor up */
+	{'l', v_cur_right},	/* Move cursor right */
+	{0, NULL}		/* Sentinel */
 };
 
-static int v_ctrl(struct v_state *v, int key)
+static int v_cmd_input(struct v_state *v, int key)
 {
-	for (int i = 0; ctrls[i].func; i++)
-		if (ctrls[i].key == key)
-			return ctrls[i].func(v);
+	if (v->mode != V_CMD)
+		return V_ERR;
+
+	for (int i = 0; cmd_keys[i].func; i++)
+		if (cmd_keys[i].key == key)
+			return cmd_keys[i].func(v);
 
 	return V_ERR;
 }
+
+/* === Insert Mode related === */
+
+static int v_switch_cmd(struct v_state *v)
+{
+	v->mode = V_CMD;
+	v_set_stats_msg(v, "");
+	return V_OK;
+}
+
+static const struct v_key insert_keys[] = {
+	{V_KEY_ESC, v_switch_cmd},	/* Switch into Command Mode */
+	{0, NULL}			/* Sentinel */
+};
+
+static int v_insert_input(struct v_state *v, int key)
+{
+	if (v->mode != V_INSERT)
+		return V_ERR;
+
+	for (int i = 0; insert_keys[i].func; i++)
+		if (insert_keys[i].key == key)
+			return insert_keys[i].func(v);
+
+	if (v_insert(v, key) == V_ERR)
+		return V_ERR;
+
+	return V_OK;
+}
+
+/* === Input related functions === */
 
 /**
  * v_prcs_key - read a key and process it for the specified v_state
@@ -93,7 +137,10 @@ int v_prcs_key(struct v_state *v)
 	if (v_nav(v, key) == V_OK)
 		return V_OK;
 
-	if (v_ctrl(v, key) == V_OK)
+	if (v_cmd_input(v, key) == V_OK)
+		return V_OK;
+
+	if (v_insert_input(v, key) == V_OK)
 		return V_OK;
 
 	return V_ERR;
@@ -112,16 +159,16 @@ static int get_prompt_input(char *buf, size_t *bufsz, size_t *buflen)
 			buf[--(*buflen)] = '\0';
 		return V_OK;
 	case V_KEY_ESC:
-		/* Signal the caller to abort the input reading loop */
+		/* Abort the input reading loop */
 		return 1;
 	case V_KEY_NL:
 	case V_KEY_RET:
-		/* Signal the caller to return the buf */
+		/* Return the buf */
 		return 2;
 	}
 
 	if (iscntrl(c) || c > 128)
-		/* Signal the caller that the input given is an invalid key */
+		/* Input given is an invalid key */
 		return 3;
 
 	if (*buflen == *bufsz - 1) {
