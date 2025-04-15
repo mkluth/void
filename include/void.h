@@ -89,11 +89,11 @@ struct v_state {
 };
 
 /**
- * struct v_keybind - represent the editor keybinding
- * key: The registered ASCII key value for the keybinding.
- * func: Pointer to the execution function once the keybinding is pressed.
+ * struct v_key - represent the editor single-key keybinding
+ * key: The registered ASCII value for the keybinding.
+ * func: Pointer to the keybinding function.
  */
-struct v_keybind {
+struct v_key {
 	int key;
 	int (*func)(struct v_state *v);
 };
@@ -101,6 +101,16 @@ struct v_keybind {
 /* src/state.c */
 struct v_state *v_new_state(void);
 int v_dstr_state(struct v_state *v);
+
+/* src/cursor.c */
+int v_cur_left(struct v_state *v);
+int v_cur_right(struct v_state *v);
+int v_cur_up(struct v_state *v);
+int v_cur_down(struct v_state *v);
+int v_cur_bol(struct v_state *v);
+int v_cur_eol(struct v_state *v);
+int v_ppage(struct v_state *v);
+int v_npage(struct v_state *v);
 
 /* src/input.c */
 int v_prcs_key(struct v_state *v);

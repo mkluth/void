@@ -6,103 +6,42 @@
 
 #include <void.h>
 
-static void snap_cur_eol(struct v_state *v)
-{
-	struct v_row *row = (v->cur_y >= v->nrows) ? NULL : &v->rows[v->cur_y];
-	int len = row ? row->len : 0;
-	if (v->cur_x > len)
-		v->cur_x = len;
-}
-
-static void v_ppage(struct v_state *v)
-{
-	v->cur_y = v->rowoff;
-	int times = v->scr_y;
-
-	while (times--) {
-		if (v->cur_y != 0)
-			v->cur_y--;
-		snap_cur_eol(v);
-	}
-}
-
-static void v_npage(struct v_state *v)
-{
-	v->cur_y = v->rowoff + v->scr_y - 1;
-	if (v->cur_y > v->nrows)
-		v->cur_y = v->nrows;
-
-	int times = v->scr_y;
-	while (times--) {
-		if (v->cur_y < v->nrows)
-			v->cur_y++;
-		snap_cur_eol(v);
-	}
-}
-
 static int v_nav(struct v_state *v, int key)
 {
-	struct v_row *row = (v->cur_y >= v->nrows) ? NULL : &v->rows[v->cur_y];
-
 	switch (key) {
 	case V_CUR_LEFT:
 	case KEY_LEFT:
 		/* Cursor left */
-		if (v->cur_x != 0) {
-			v->cur_x--;
-		} else if (v->cur_y > 0) {
-			v->cur_y--;
-			v->cur_x = v->rows[v->cur_y].len;
-		}
-		break;
+		return v_cur_left(v);
 	case V_CUR_RGHT:
 	case KEY_RIGHT:
 		/* Cursor right */
-		if (row && v->cur_x < row->len) {
-			v->cur_x++;
-		} else if (row && v->cur_x == row->len) {
-			v->cur_y++;
-			v->cur_x = 0;
-		}
-		break;
+		return v_cur_right(v);
 	case V_CUR_UP:
 	case KEY_UP:
 		/* Cursor up */
-		if (v->cur_y != 0)
-			v->cur_y--;
-		break;
+		return v_cur_up(v);
 	case V_CUR_DOWN:
 	case KEY_DOWN:
 		/* Cursor down */
-		if (v->cur_y < v->nrows)
-			v->cur_y++;
-		break;
+		return v_cur_down(v);
 	case V_CUR_SOL:
 	case KEY_HOME:
 		/* Jump to the start of the line */
-		v->cur_x = 0;
-		return V_OK;
+		return v_cur_bol(v);
 	case V_CUR_EOL:
 	case KEY_END:
 		/* Jump to the end of the line */
-		if (v->cur_y < v->nrows)
-			v->cur_x = row->len;
-		return V_OK;
+		return v_cur_eol(v);
 	case KEY_PPAGE:
 		/* Page up */
-		v_ppage(v);
-		return V_OK;
+		return v_ppage(v);
 	case KEY_NPAGE:
 		/* Page down */
-		v_npage(v);
-		return V_OK;
-	default:
-		return V_ERR;
+		return v_npage(v);
 	}
 
-	snap_cur_eol(v);
-
-	return V_OK;
+	return V_ERR;
 }
 
 static int v_quit(struct v_state *v)
@@ -121,7 +60,7 @@ quit:
 	return V_OK;
 }
 
-static const struct v_keybind ctrls[] = {
+static const struct v_key ctrls[] = {
 	{V_CTRL_QUIT, v_quit},		/* Quit the editor */
 	{0, NULL}			/* Sentinel */
 };
