@@ -64,22 +64,21 @@ static int v_switch_insert(struct v_state *v)
 }
 
 static const struct v_key cmd_keys[] = {
-	{CTRL('q'), v_quit},	/* Quit the editor */
-	{'$', v_cur_eol},	/* Jump to EOL */
-	{'0', v_cur_bol},	/* Jump to BOL */
-	{'h', v_cur_left},	/* Move cursor left */
-	{'i', v_switch_insert},	/* Switch into Insert Mode */
-	{'j', v_cur_down},	/* Move cursor down */
-	{'k', v_cur_up},	/* Move cursor up */
-	{'l', v_cur_right},	/* Move cursor right */
-	{0, NULL}		/* Sentinel */
+	{CTRL('l'), v_rfsh_scr},	/* 12, Force refresh editor window */
+	{CTRL('q'), v_quit},		/* 17, Quit the editor */
+	{CTRL('s'), v_save},		/* 19, Save changes made */
+	{'$', v_cur_eol},		/* 36, Jump to EOL */
+	{'0', v_cur_bol},		/* 48, Jump to BOL */
+	{'h', v_cur_left},		/* 104, Move cursor left */
+	{'i', v_switch_insert},		/* 105, Switch into Insert Mode */
+	{'j', v_cur_down},		/* 106, Move cursor down */
+	{'k', v_cur_up},		/* 107, Move cursor up */
+	{'l', v_cur_right},		/* 108, Move cursor right */
+	{0, NULL}			/* Sentinel */
 };
 
 static int v_cmd_input(struct v_state *v, int key)
 {
-	if (v->mode != V_CMD)
-		return V_ERR;
-
 	for (int i = 0; cmd_keys[i].func; i++)
 		if (cmd_keys[i].key == key)
 			return cmd_keys[i].func(v);
@@ -96,16 +95,30 @@ static int v_switch_cmd(struct v_state *v)
 	return V_OK;
 }
 
+static int v_del(struct v_state *v)
+{
+	v_cur_right(v);
+	if (v_backspace(v) == V_ERR)
+		return V_ERR;
+
+	return V_OK;
+}
+
 static const struct v_key insert_keys[] = {
-	{V_KEY_ESC, v_switch_cmd},	/* Switch into Command Mode */
+	{CTRL('l'), v_rfsh_scr},	/* 12, Force refresh editor window */
+	{'\b', v_backspace},		/* 8, Left backspacing */
+	{V_KEY_NL, v_insert_nl},	/* 10, Insert newline */
+	{V_KEY_RET, v_insert_nl},	/* 13, Insert newline */
+	{V_KEY_ESC, v_switch_cmd},	/* 27, Switch into Command Mode */
+	{V_KEY_BKSP, v_backspace},	/* 127, Left backspacing */
+	{KEY_BACKSPACE, v_backspace},	/* 263, Left backspacing */
+	{KEY_DC, v_del},		/* 330, Right backspacing */
+	{KEY_ENTER, v_insert_nl},	/* 343, Insert newline */
 	{0, NULL}			/* Sentinel */
 };
 
 static int v_insert_input(struct v_state *v, int key)
 {
-	if (v->mode != V_INSERT)
-		return V_ERR;
-
 	for (int i = 0; insert_keys[i].func; i++)
 		if (insert_keys[i].key == key)
 			return insert_keys[i].func(v);
@@ -137,13 +150,13 @@ int v_prcs_key(struct v_state *v)
 	if (v_nav(v, key) == V_OK)
 		return V_OK;
 
-	if (v_cmd_input(v, key) == V_OK)
-		return V_OK;
+	if (v->mode == V_CMD)
+		return v_cmd_input(v, key);
 
-	if (v_insert_input(v, key) == V_OK)
-		return V_OK;
+	if (v_insert_input(v, key) == V_ERR)
+		return V_ERR;
 
-	return V_ERR;
+	return V_OK;
 }
 
 static int get_prompt_input(char *buf, size_t *bufsz, size_t *buflen)

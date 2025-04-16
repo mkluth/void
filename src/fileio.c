@@ -28,12 +28,12 @@
  */
 int v_open(struct v_state *v, char *filename)
 {
-	FILE *fp = fopen(filename, "r");
-	if (!fp)
-		return V_ERR;
-
 	v->filename = strdup(filename);
 	if (!v->filename)
+		return V_ERR;
+
+	FILE *fp = fopen(filename, "r");
+	if (!fp)
 		return V_ERR;
 
 	char *s = NULL;
