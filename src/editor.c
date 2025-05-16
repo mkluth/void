@@ -1,3 +1,22 @@
+/*
+ * editor.c - High-level character and line manipulation routines
+ *
+ * Contains logic for character insertion, deletion, and line operations.
+ * Unlike row.c, the routines available here operate at a higher level of
+ * abstraction.
+ *
+ * Parts of this file are based on the kilo text editor by Salvatore Sanfilippo
+ * and Paige Ruten (snaptoken)'s Build Your Own Text Editor booklet:
+ *	Copyright (c) 2016 Salvatore Sanfilippo <antirez@gmail.com>
+ *	Copyright (c) 2017 Paige Ruten <paige.ruten@gmail.com>
+ *
+ * Current development and maintenance by:
+ * 	Copyright (c) 2025-Present Luth <https://github.com/mkluth>
+ *
+ * This file is a part of the void text editor.
+ * It is licensed under MIT License. See the LICENSE file for details.
+ */
+
 #include <stdbool.h>
 
 #include <void.h>

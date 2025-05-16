@@ -1,3 +1,20 @@
+/*
+ * cursor.c - Cursor movement routines
+ *
+ * Contains logic for moving the cursor across lines and characters.
+ *
+ * Parts of this file are based on the kilo text editor by Salvatore Sanfilippo
+ * and Paige Ruten (snaptoken)'s Build Your Own Text Editor booklet:
+ *	Copyright (c) 2016 Salvatore Sanfilippo <antirez@gmail.com>
+ *	Copyright (c) 2017 Paige Ruten <paige.ruten@gmail.com>
+ *
+ * Current development and maintenance by:
+ * 	Copyright (c) 2025-Present Luth <https://github.com/mkluth>
+ *
+ * This file is a part of the void text editor.
+ * It is licensed under MIT License. See the LICENSE file for details.
+ */
+
 #include <void.h>
 
 static void snap_cur_eol(struct v_state *v)

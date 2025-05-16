@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 #define V_VER		"0.0.1"
-#define V_DESC		"A stupid UNIX text editor"
+#define V_DESC		"Built like Vim, but worse. <https://github.com/mkluth>"
 #define V_WC		"void/Void " V_VER " -- " V_DESC
 
 #define V_STATS_MSG_BUF		100	/* Status message buffer */

@@ -1,3 +1,30 @@
+/*
+ * output.c - Output-related routines
+ *
+ * This file contains routines responsible for the editor’s screen output and
+ * rendering, including the stupid one line welcome message, screen refresh
+ * logic, status bar, message bar, scrolling, and cursor positioning. These
+ * routines rely heavily on ncurses functionality.
+ *
+ * As a result, this editor is supported only on Linux-based systems (e.g.,
+ * Ubuntu, Arch, Fedora) and macOS. Windows users must use WSL. There is no
+ * current plan to support PDCurses or native Windows terminals.
+ *
+ * This editor has also been tested on Termux (Android) and it works as
+ * expected.
+ *
+ * Parts of this file are based on the kilo text editor by Salvatore Sanfilippo
+ * and Paige Ruten (snaptoken)'s Build Your Own Text Editor booklet:
+ *	Copyright (c) 2016 Salvatore Sanfilippo <antirez@gmail.com>
+ *	Copyright (c) 2017 Paige Ruten <paige.ruten@gmail.com>
+ *
+ * Current development and maintenance by:
+ * 	Copyright (c) 2025-Present Luth <https://github.com/mkluth>
+ *
+ * This file is a part of the void text editor.
+ * It is licensed under MIT License. See the LICENSE file for details.
+ */
+
 #include <ncurses.h>
 #include <string.h>
 #include <stdarg.h>
@@ -22,7 +49,10 @@ static void v_draw_y(struct v_state *v, int y)
 	}
 
 	if (v->nrows == 0 && y == v->scr_y / 3) {
-		/* Display welcome message */
+		/*
+		 * Display one line welcome message (I'm too lazy to make it
+		 * displays on different multiple lines for now)
+		 */
 		int len = strlen(V_WC);
 		if (len > v->scr_x)
 			len = v->scr_x;

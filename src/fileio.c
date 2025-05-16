@@ -1,3 +1,22 @@
+/*
+ * fileio.c - File I/O operation routines
+ *
+ * Contains logic for file I/O operations, including loading the contents of a
+ * target file into the editor buffer and saving the edited buffer back to the
+ * target file.
+ *
+ * Parts of this file are based on the kilo text editor by Salvatore Sanfilippo
+ * and Paige Ruten (snaptoken)'s Build Your Own Text Editor booklet:
+ *	Copyright (c) 2016 Salvatore Sanfilippo <antirez@gmail.com>
+ *	Copyright (c) 2017 Paige Ruten <paige.ruten@gmail.com>
+ *
+ * Current development and maintenance by:
+ * 	Copyright (c) 2025-Present Luth <https://github.com/mkluth>
+ *
+ * This file is a part of the void text editor.
+ * It is licensed under MIT License. See the LICENSE file for details.
+ */
+
 #define _DEFAULT_SOURCE
 #define _BSD_SOURCE
 #define _GNU_SOURCE
@@ -19,10 +38,10 @@
  * v: Pointer to the targeted v_state struct.
  * filename: The name of the targeted file.
  *
- * Open a file and load its content into the editor buffer. For now, this
- * function only works if the target file already exist. All of the file
- * content will be saves into v->rows array and ready for any kinds of text
- * manipulation.
+ * Open a file and load its content into the editor buffer. If the target file
+ * does not exist, nothing will be saved into v->rows array. Otherwise, all of
+ * the file content will be saved into v->rows array and ready for any kinds of
+ * text manipulation.
  *
  * Returns V_OK on success, V_ERR otherwise.
  */

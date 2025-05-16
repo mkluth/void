@@ -1,3 +1,28 @@
+/*
+ * input.c - Various input routines
+ *
+ * Handles and processes various user input depending on the current editor mode
+ * before executing any further actions. The editor uses hardcoded keybindings
+ * which is stored in cmd_keys and insert_keys v_key struct arrays. Each key is
+ * assigned its own function, ready to be dispatched when called. This file also
+ * provides a routine to read user input via the editor prompt.
+ *
+ * Parts of this file are based on the kilo text editor by Salvatore Sanfilippo
+ * and Paige Ruten (snaptoken)'s Build Your Own Text Editor booklet:
+ *	Copyright (c) 2016 Salvatore Sanfilippo <antirez@gmail.com>
+ *	Copyright (c) 2017 Paige Ruten <paige.ruten@gmail.com>
+ *
+ * The keybinding table approach used here is based on Linus Torvalds's
+ * uEmacs/PK 4.0 editor:
+ * 	Copyright (c) 2018 Linus Torvalds <torvalds@linux-foundation.org>
+ *
+ * Current development and maintenance by:
+ * 	Copyright (c) 2025-Present Luth <https://github.com/mkluth>
+ *
+ * This file is a part of the void text editor.
+ * It is licensed under MIT License. See the LICENSE file for details.
+ */
+
 #include <stddef.h>
 #include <ncurses.h>
 #include <stdbool.h>
