@@ -56,6 +56,12 @@ quit:
 	return V_OK;
 }
 
+static int v_force_quit(struct v_state *v)
+{
+	v->run = false;
+	return V_OK;
+}
+
 static int v_switch_insert(struct v_state *v)
 {
 	v->mode = V_INSERT;
@@ -63,17 +69,65 @@ static int v_switch_insert(struct v_state *v)
 	return V_OK;
 }
 
+static int v_nl_above(struct v_state *v)
+{
+	if (v->cur_y > v->nrows)
+		return V_ERR;
+
+	struct v_row *row = &v->rows[v->cur_y];
+	if (!row) {
+		if (v_insert_row(v, v->cur_y, "", 0) == V_ERR)
+			return V_ERR;
+	}
+
+	if (v_insert_row(v, v->cur_y, "", 0) == V_ERR)
+		return V_ERR;
+
+	v->cur_x = 0;
+	v_switch_insert(v);
+
+	return V_OK;
+}
+
+static int v_nl_below(struct v_state *v)
+{
+	if (v->cur_y > v->nrows)
+		return V_ERR;
+
+	struct v_row *row = &v->rows[v->cur_y];
+	if (!row) {
+		if (v_insert_row(v, v->cur_y, "", 0) == V_ERR)
+			return V_ERR;
+	}
+
+	if (v_insert_row(v, v->cur_y + 1, "", 0) == V_ERR)
+		return V_ERR;
+
+	v->cur_y++;
+	v->cur_x = 0;
+	v_switch_insert(v);
+
+	return V_OK;
+}
+
 static const struct v_key cmd_keys[] = {
 	{CTRL('l'), v_rfsh_scr},	/* 12, Force refresh editor window */
 	{CTRL('q'), v_quit},		/* 17, Quit the editor */
 	{CTRL('s'), v_save},		/* 19, Save changes made */
-	{'$', v_cur_eol},		/* 36, Jump to EOL */
-	{'0', v_cur_bol},		/* 48, Jump to BOL */
+	{CTRL('x'), v_force_quit},	/* 24, Force quit the editor */
+	{'$', v_cur_eol},		/* 36, Go to EOL */
+	{'0', v_cur_bol},		/* 48, Go to BOL */
+	{'G', v_bottom_pg},		/* 71, Go to the bottom of the page */
+	{'O', v_nl_above},		/* 79, Add a new line above */
+	{'X', v_backspace},		/* 88, Left backspacing */
+	{'g', v_top_pg},		/* 103, Go to the top of the page */
 	{'h', v_cur_left},		/* 104, Move cursor left */
 	{'i', v_switch_insert},		/* 105, Switch into Insert Mode */
 	{'j', v_cur_down},		/* 106, Move cursor down */
 	{'k', v_cur_up},		/* 107, Move cursor up */
 	{'l', v_cur_right},		/* 108, Move cursor right */
+	{'o', v_nl_below},		/* 111, Add a new line below */
+	{'x', v_right_backspace},	/* 120, Right backspacing */
 	{0, NULL}			/* Sentinel */
 };
 
@@ -95,15 +149,6 @@ static int v_switch_cmd(struct v_state *v)
 	return V_OK;
 }
 
-static int v_del(struct v_state *v)
-{
-	v_cur_right(v);
-	if (v_backspace(v) == V_ERR)
-		return V_ERR;
-
-	return V_OK;
-}
-
 static const struct v_key insert_keys[] = {
 	{CTRL('l'), v_rfsh_scr},	/* 12, Force refresh editor window */
 	{'\b', v_backspace},		/* 8, Left backspacing */
@@ -112,7 +157,7 @@ static const struct v_key insert_keys[] = {
 	{V_KEY_ESC, v_switch_cmd},	/* 27, Switch into Command Mode */
 	{V_KEY_BKSP, v_backspace},	/* 127, Left backspacing */
 	{KEY_BACKSPACE, v_backspace},	/* 263, Left backspacing */
-	{KEY_DC, v_del},		/* 330, Right backspacing */
+	{KEY_DC, v_right_backspace},	/* 330, Right backspacing */
 	{KEY_ENTER, v_insert_nl},	/* 343, Insert newline */
 	{0, NULL}			/* Sentinel */
 };

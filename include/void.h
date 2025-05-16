@@ -103,6 +103,8 @@ int v_cur_bol(struct v_state *v);
 int v_cur_eol(struct v_state *v);
 int v_ppage(struct v_state *v);
 int v_npage(struct v_state *v);
+int v_bottom_pg(struct v_state *v);
+int v_top_pg(struct v_state *v);
 
 /* src/input.c */
 int v_prcs_key(struct v_state *v);
@@ -125,6 +127,7 @@ int v_save(struct v_state *v);
 int v_insert(struct v_state *v, int c);
 int v_insert_nl(struct v_state *v);
 int v_backspace(struct v_state *v);
+int v_right_backspace(struct v_state *v);
 
 /* src/row.c */
 int v_render_row(struct v_row *row);

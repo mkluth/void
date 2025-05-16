@@ -180,3 +180,37 @@ int v_npage(struct v_state *v)
 
 	return V_OK;
 }
+
+/**
+ * v_bottom_pg - go to the bottom of the page
+ * v: Pointer to the targeted v_state struct.
+ *
+ * Go to the bottom of the page. Nothing trivial, it simply changes the cursor
+ * position values to the last line of currently opened buffer. The actual
+ * screen update can only be seen once v_rfsh_scr() is called.
+ *
+ * Returns V_OK always.
+ */
+int v_bottom_pg(struct v_state *v)
+{
+	v->cur_y = v->nrows - 1;
+	v->cur_x = 0;
+	return V_OK;
+}
+
+/**
+ * v_top_pg - go to the top of the page
+ * v: Pointer to the targeted v_state struct.
+ *
+ * Go to the top of the page. Nothing trivial here too, it simply changes the
+ * cursor position values to 0. The actual screen update can only be seen once
+ * v_rfsh_scr() is called.
+ *
+ * Returns V_OK always, no matter what.
+ */
+int v_top_pg(struct v_state *v)
+{
+	v->cur_y = 0;
+	v->cur_x = 0;
+	return V_OK;
+}

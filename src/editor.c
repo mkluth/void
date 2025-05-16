@@ -148,3 +148,23 @@ left_backspace:
 
 	return v->cur_x;
 }
+
+/**
+ * v_right_backspace - right backspacing at the targeted v_state
+ * v: Pointer to the targeted v_state struct.
+ *
+ * Right backspacing at the targeted v_state. Nothing complex here, simply move
+ * the cursor to the right and backspace using v_backspace() function. v->dirty
+ * flag will be setted to true automatically by v_backspace(). Value of the
+ * cursor's x and y position will be updated.
+ *
+ * Returns V_OK on success, V_ERR otherwise.
+ */
+int v_right_backspace(struct v_state *v)
+{
+	v_cur_right(v);
+	if (v_backspace(v) == V_ERR)
+		return V_ERR;
+
+	return V_OK;
+}
