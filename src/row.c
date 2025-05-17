@@ -1,3 +1,24 @@
+/*
+ * row.c - v_row struct manipulation routines
+ *
+ * This file provides low-level routines for manipulating v_row structs,
+ * including rendering, insertion, deletion, deallocation, character insertion,
+ * string appending, and character deletion. These routines are more specific
+ * and low-level compared to the higher-level operation routines provided in
+ * editor.c.
+ *
+ * Parts of this file are based on the kilo text editor by Salvatore Sanfilippo
+ * and Paige Ruten (snaptoken)'s Build Your Own Text Editor booklet:
+ *	Copyright (c) 2016 Salvatore Sanfilippo <antirez@gmail.com>
+ *	Copyright (c) 2017 Paige Ruten <paige.ruten@gmail.com>
+ *
+ * Current development and maintenance by:
+ * 	Copyright (c) 2025-Present Luth <https://github.com/mkluth>
+ *
+ * This file is a part of the void text editor.
+ * It is licensed under MIT License. See the LICENSE file for details.
+ */
+
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>

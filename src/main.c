@@ -3,11 +3,6 @@
  *
  * This file contains the main driving routine for the editor.
  *
- * This editor is supported only on Linux-based systems (e.g., Ubuntu, Arch,
- * Fedora, etc) and macOS. It heavily relies on ncurses functionality. There's
- * no current plan to support PDCurses or native Windows terminal. This editor
- * has also been tested on Termux (Android) and yes, it works fine.
- *
  * Parts of this program are based on the kilo text editor by Salvatore
  * Sanfilippo, Paige Ruten (snaptoken)'s Build Your Own Text Editor booklet and
  * Linus Torvalds's uEmacs/PK 4.0 editor input approach:

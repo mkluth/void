@@ -1,3 +1,16 @@
+/*
+ * state.c - v_state struct manipulation routines
+ *
+ * This file provides routines for initializing a new, empty v_state struct and
+ * destroying an existing one.
+ *
+ * Current development and maintenance by:
+ * 	Copyright (c) 2025-Present Luth <https://github.com/mkluth>
+ *
+ * This file is a part of the void text editor.
+ * It is licensed under MIT License. See the LICENSE file for details.
+ */
+
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdbool.h>

@@ -1,12 +1,22 @@
+/*
+ * void.h - Core editor structs, macros and operation routines declarations
+ *
+ * Current development and maintenance by:
+ * 	Copyright (c) 2025-Present Luth <https://github.com/mkluth>
+ *
+ * This file is a part of the void text editor.
+ * It is licensed under MIT License. See the LICENSE file for details.
+ */
+
 #ifndef VOID_H
 #define VOID_H
 
-#include <ncurses.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 #define V_VER		"0.0.1"
 #define V_DESC		"Built like Vim, but worse. <https://github.com/mkluth>"
-#define V_WC		"void/Void " V_VER " -- " V_DESC
+#define V_WC		"void " V_VER " -- " V_DESC
 
 #define V_STATS_MSG_BUF		100	/* Status message buffer */
 #define V_DEFAULT_BUF_SZ	128	/* Default prompt buffer size */

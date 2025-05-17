@@ -1,3 +1,18 @@
+/*
+ * term.c - Terminal window manipulation routines
+ *
+ * This file provides routines for initializing the terminal window into curses
+ * mode, setting up curses colors support and resetting the terminal window
+ * state back into cooked mode. All of the routines available here heavily
+ * rely on ncurses.
+ *
+ * Current development and maintenance by:
+ * 	Copyright (c) 2025-Present Luth <https://github.com/mkluth>
+ *
+ * This file is a part of the void text editor.
+ * It is licensed under MIT License. See the LICENSE file for details.
+ */
+
 #include <ncurses.h>
 #include <stdbool.h>
 
@@ -33,10 +48,10 @@ int v_init_term(struct v_state *v)
  * v_init_colors - initialize colors support for the specified v_state
  * v: Pointer to the targeted v_state struct.
  *
- * Initialize colors support for the specified v_state. You should only call this
- * function once v_init_term() is called previously. This function will sets the
- * v->colors flag to true if the terminal does support colors manipulation and
- * the editor NCURSES color pairs will be defined after.
+ * Initialize colors support for the specified v_state. You should only call
+ * this function once v_init_term() is called previously. This function will
+ * sets the v->colors flag to true if the terminal does support colors
+ * manipulation and the editor NCURSES color pairs will be defined after.
  *
  * Returns V_OK if the terminal supports colors manipulation, V_ERR otherwise.
  */
