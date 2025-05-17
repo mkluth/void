@@ -15,13 +15,15 @@
 #include <stddef.h>
 
 #define V_VER		"0.0.1"
-#define V_DESC		"Built like Vim, but worse. <https://github.com/mkluth>"
-#define V_WC		"void " V_VER " -- " V_DESC
+#define V_DESC		"Built like Vim and GNU nano, but worse."
+#define V_WELCOME_MSG	"void " V_VER " -- " V_DESC
+#define V_AUTHOR	"by Luth <https://github.com/mkluth>"
 
 #define V_STATS_MSG_BUF		100	/* Status message buffer */
 #define V_DEFAULT_BUF_SZ	128	/* Default prompt buffer size */
-#define V_STATS_LEFT_MAX	128	/* Default left status bar buffer */
-#define V_STATS_RIGHT_MAX	32	/* Default right status bar buffer */
+#define V_STATS_LEFT_MAX	128	/* Default left status bar length */
+#define V_STATS_RIGHT_MAX	32	/* Default right status bar length */
+#define V_WELCOME_MSG_BUF	100	/* Default welcome message length */
 
 #define V_BAR		1		/* Editor bar color pair number */
 #define V_BAR_FG	COLOR_BLACK	/* Editor bar foreground color */

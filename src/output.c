@@ -41,12 +41,19 @@ static void v_draw_y(struct v_state *v, int y)
 		return;
 	}
 
-	if (v->nrows == 0 && y == v->scr_y / 3) {
-		/*
-		 * Display one line welcome message (I'm too lazy to make it
-		 * displays on different multiple lines for now)
-		 */
-		int len = strlen(V_WC);
+	if (v->nrows == 0 && (y == v->scr_y / 3 || y == v->scr_y / 3 + 1)) {
+		/* Display the stupid two lines welcome message */
+		char msg[V_WELCOME_MSG_BUF];
+		int len = 0;
+
+		if (y == v->scr_y / 3)
+			len = snprintf(msg, sizeof(msg), V_WELCOME_MSG);
+		else if (y == v->scr_y / 3 + 1)
+			len = snprintf(msg, sizeof(msg), V_AUTHOR);
+
+		if (len < 0)
+			goto tildes;
+
 		if (len > v->scr_x)
 			len = v->scr_x;
 
@@ -59,11 +66,12 @@ static void v_draw_y(struct v_state *v, int y)
 		while (padding--)
 			printw(" ");
 
-		addnstr(V_WC, len);
+		addnstr(msg, len);
 
 		return;
 	}
 
+tildes:
 	printw("~\n");
 }
 
