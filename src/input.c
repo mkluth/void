@@ -31,34 +31,26 @@
 
 #include <void.h>
 
-static int v_nav(struct v_state *v, int key)
+/* === Global keys === */
+
+static const struct v_key global_keys[] = {
+	{KEY_LEFT, v_cur_left},		/* Arrow Left key */
+	{KEY_RIGHT, v_cur_right},	/* Arrow Right key */
+	{KEY_UP, v_cur_up},		/* Arrow Up key */
+	{KEY_DOWN, v_cur_down},		/* Arrow Down key */
+	{KEY_HOME, v_cur_bol},		/* Home key */
+	{KEY_END, v_cur_eol},		/* End key */
+	{KEY_PPAGE, v_ppage},		/* Page Up key */
+	{KEY_NPAGE, v_npage},		/* Page Down key */
+	{KEY_DC, v_right_backspace},	/* Del key */
+	{0, NULL}			/* Sentinel */
+};
+
+static int v_global(struct v_state *v, int key)
 {
-	switch (key) {
-	case KEY_LEFT:
-		/* Cursor left */
-		return v_cur_left(v);
-	case KEY_RIGHT:
-		/* Cursor right */
-		return v_cur_right(v);
-	case KEY_UP:
-		/* Cursor up */
-		return v_cur_up(v);
-	case KEY_DOWN:
-		/* Cursor down */
-		return v_cur_down(v);
-	case KEY_HOME:
-		/* Jump to the start of the line */
-		return v_cur_bol(v);
-	case KEY_END:
-		/* Jump to the end of the line */
-		return v_cur_eol(v);
-	case KEY_PPAGE:
-		/* Page up */
-		return v_ppage(v);
-	case KEY_NPAGE:
-		/* Page down */
-		return v_npage(v);
-	}
+	for (int i = 0; global_keys[i].func; i++)
+		if (global_keys[i].key == key)
+			return global_keys[i].func(v);
 
 	return V_ERR;
 }
@@ -182,7 +174,6 @@ static const struct v_key insert_keys[] = {
 	{V_KEY_ESC, v_switch_cmd},	/* 27, Switch into Command Mode */
 	{V_KEY_BKSP, v_backspace},	/* 127, Left backspacing */
 	{KEY_BACKSPACE, v_backspace},	/* 263, Left backspacing */
-	{KEY_DC, v_right_backspace},	/* 330, Right backspacing */
 	{KEY_ENTER, v_insert_nl},	/* 343, Insert newline */
 	{0, NULL}			/* Sentinel */
 };
@@ -193,10 +184,7 @@ static int v_insert_input(struct v_state *v, int key)
 		if (insert_keys[i].key == key)
 			return insert_keys[i].func(v);
 
-	if (v_insert(v, key) == V_ERR)
-		return V_ERR;
-
-	return V_OK;
+	return v_insert(v, key);
 }
 
 /* === Input related functions === */
@@ -217,16 +205,13 @@ int v_prcs_key(struct v_state *v)
 		return V_ERR;
 
 	int key = getch();
-	if (v_nav(v, key) == V_OK)
+	if (v_global(v, key) == V_OK)
 		return V_OK;
 
 	if (v->mode == V_CMD)
 		return v_cmd_input(v, key);
 
-	if (v_insert_input(v, key) == V_ERR)
-		return V_ERR;
-
-	return V_OK;
+	return v_insert_input(v, key);
 }
 
 static int get_prompt_input(char *buf, size_t *bufsz, size_t *buflen)

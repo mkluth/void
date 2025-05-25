@@ -10,7 +10,7 @@ LIBS := -lncurses
 INCLUDES := -I./src -I./include
 SRCS := $(shell find ./src -name "*.c")
 
-CFLAGS := -Wall -Wextra $(INCLUDES)
+CFLAGS := -Wall -Wextra -O3 $(INCLUDES)
 
 # The default build instruction if you run "make" without argument
 all: obj $(EXE)
@@ -21,7 +21,7 @@ $(EXE): obj
 	mv -f *.o ./obj
 
 obj: $(SRCS)
-	$(CC) $(CFLAGS) -O3 -c $^
+	$(CC) $(CFLAGS) -c $^
 
 # The build instruction if you run "make debug"
 debug: objdebug

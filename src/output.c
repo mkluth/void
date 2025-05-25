@@ -211,7 +211,7 @@ int v_rfsh_scr(struct v_state *v)
 		return V_ERR;
 
 	v_scroll(v);
-	curs_set(2);
+	curs_set(0);
 	v_draw_scr_y(v);
 	v_draw_bar(v);
 	v_draw_msg_bar(v);
