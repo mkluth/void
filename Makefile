@@ -1,39 +1,32 @@
-# A stupidly written Makefile.
-# Not currently portable due to excessive usage of Linux commands.
-# You're on Windows? Use WSL if possible or wait for this file to be updated.
-# Or you could just install a Linux distro on your machine if you want to.
-#
-# Author: Luth
+CC := gcc
+CFLAGS := -I./include -Wall -Wextra
+LDFLAGS := -lncurses
+DEBUG_FLAGS := -g
 
-EXE := void
-LIBS := -lncurses
-INCLUDES := -I./src -I./include
-SRCS := $(shell find ./src -name "*.c")
+SRC_DIR := src
+INCLUDE_DIR := include
+OBJ_DIR := obj
+BIN := void
 
-CFLAGS := -Wall -Wextra -O3 $(INCLUDES)
+SRCS := $(wildcard $(SRC_DIR)/*.c)
+OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRCS))
 
-# The default build instruction if you run "make" without argument
-all: obj $(EXE)
+all: CFLAGS += -O3
+all: $(BIN)
 
-$(EXE): obj
-	$(CC) *.o $(LIBS) -o $@
-	mkdir -p ./obj
-	mv -f *.o ./obj
+debug: CFLAGS += $(DEBUG_FLAGS) -Og
+debug: $(BIN)
 
-obj: $(SRCS)
-	$(CC) $(CFLAGS) -c $^
+$(BIN): $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-# The build instruction if you run "make debug"
-debug: objdebug
-	$(CC) *.o $(LIBS) -g -o $(EXE)
-	mkdir -p ./obj
-	mv -f *.o ./obj
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-objdebug: $(SRCS)
-	$(CC) $(CFLAGS) -g -c $^
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
 
-# The build instruction if you run "make clean"
-.PHONY: clean
 clean:
-	$(RM) $(EXE) *.o
-	$(RM) -r ./obj
+	rm -rf $(OBJ_DIR) $(BIN)
+
+.PHONY: all debug clean
