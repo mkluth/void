@@ -17,12 +17,38 @@
  * It is licensed under MIT License. See the LICENSE file for details.
  */
 
+#include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 #include <void.h>
 
+static void usage(void)
+{
+	printf("void %s - %s\n\n", V_VER, V_DESC);
+	fputs("Usage: void [arguments] [file]\tEdit specified file.\n\n", stdout);
+	fputs("Arguments:\n", stdout);
+	fputs("   --help\tDisplay this help and exit.\n", stdout);
+	fputs("   --version\tOutput version information and exit.\n", stdout);
+
+	exit(EXIT_FAILURE);
+}
+
+static void version(void)
+{
+	printf("void -- version %s\n", V_VER);
+	exit(EXIT_SUCCESS);
+}
+
 int main(int argc, char **argv)
 {
+	if (argc == 2) {
+		if (strcmp(argv[1], "--help") == 0)
+			usage();
+		if (strcmp(argv[1], "--version") == 0)
+			version();
+	}
+
 	struct v_state *v = v_new_state();
 	v_init_term(v);
 	v_init_colors(v);
