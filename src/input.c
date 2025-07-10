@@ -42,7 +42,7 @@ static const struct v_key global_keys[] = {
 	{KEY_END, v_cur_eol},		/* End key */
 	{KEY_PPAGE, v_ppage},		/* Page Up key */
 	{KEY_NPAGE, v_npage},		/* Page Down key */
-	{KEY_DC, v_right_backspace},	/* Del key */
+	{KEY_DC, v_right_bksp},		/* Del key */
 	{0, NULL}			/* Sentinel */
 };
 
@@ -56,6 +56,16 @@ static int v_global(struct v_state *v, int key)
 }
 
 /* === Command Mode related === */
+
+static int v_cur_pos(struct v_state *v)
+{
+	int stats = v_set_stats_msg(v, "[ Line %d, Column %d ]", v->cur_y + 1,
+				   v->rcur_x + 1);
+	if (stats != V_ERR)
+		return V_OK;
+
+	return V_ERR;
+}
 
 static int v_quit(struct v_state *v)
 {
@@ -128,15 +138,22 @@ static int v_nl_below(struct v_state *v)
 }
 
 static const struct v_key cmd_keys[] = {
-	{CTRL('l'), v_rfsh_scr},	/* 12, Force refresh editor window */
-	{CTRL('q'), v_quit},		/* 17, Quit the editor */
-	{CTRL('s'), v_save},		/* 19, Save changes made */
-	{CTRL('x'), v_force_quit},	/* 24, Force quit the editor */
-	{'$', v_cur_eol},		/* 36, Go to EOL */
-	{'0', v_cur_bol},		/* 48, Go to BOL */
-	{'G', v_bottom_pg},		/* 71, Go to the bottom of the page */
-	{'O', v_nl_above},		/* 79, Add a new line above */
-	{'X', v_backspace},		/* 88, Left backspacing */
+	{CTRL('a'), v_cur_bol},		/*   1, Go to BOL */
+	{CTRL('c'), v_cur_pos},		/*   3, Show current cursor position */
+	{CTRL('d'), v_right_bksp}, 	/*   4, Right backspacing */
+	{CTRL('e'), v_cur_eol},		/*   5, Go to EOL */
+	{CTRL('h'), v_bksp},		/*   8, Left backspacing */
+	{CTRL('n'), v_cur_down},	/*  14, Next line (cursor down) */
+	{CTRL('p'), v_cur_up},		/*  16, Previous line (cursor up) */
+	{CTRL('l'), v_rfsh_scr},	/*  12, Force refresh editor window */
+	{CTRL('q'), v_quit},		/*  17, Quit the editor */
+	{CTRL('s'), v_save},		/*  19, Save changes made */
+	{CTRL('x'), v_force_quit},	/*  24, Force quit the editor */
+	{'$', v_cur_eol},		/*  36, Go to EOL */
+	{'0', v_cur_bol},		/*  48, Go to BOL */
+	{'G', v_bottom_pg},		/*  71, Go to the bottom of the page */
+	{'O', v_nl_above},		/*  79, Add a new line above */
+	{'X', v_bksp},			/*  88, Left backspacing */
 	{'g', v_top_pg},		/* 103, Go to the top of the page */
 	{'h', v_cur_left},		/* 104, Move cursor left */
 	{'i', v_switch_insert},		/* 105, Switch into Insert Mode */
@@ -144,7 +161,7 @@ static const struct v_key cmd_keys[] = {
 	{'k', v_cur_up},		/* 107, Move cursor up */
 	{'l', v_cur_right},		/* 108, Move cursor right */
 	{'o', v_nl_below},		/* 111, Add a new line below */
-	{'x', v_right_backspace},	/* 120, Right backspacing */
+	{'x', v_right_bksp},		/* 120, Right backspacing */
 	{0, NULL}			/* Sentinel */
 };
 
@@ -167,13 +184,13 @@ static int v_switch_cmd(struct v_state *v)
 }
 
 static const struct v_key insert_keys[] = {
-	{CTRL('l'), v_rfsh_scr},	/* 12, Force refresh editor window */
-	{'\b', v_backspace},		/* 8, Left backspacing */
-	{V_KEY_NL, v_insert_nl},	/* 10, Insert newline */
-	{V_KEY_RET, v_insert_nl},	/* 13, Insert newline */
-	{V_KEY_ESC, v_switch_cmd},	/* 27, Switch into Command Mode */
-	{V_KEY_BKSP, v_backspace},	/* 127, Left backspacing */
-	{KEY_BACKSPACE, v_backspace},	/* 263, Left backspacing */
+	{'\b', v_bksp},			/*   8, Left backspacing */
+	{CTRL('l'), v_rfsh_scr},	/*  12, Force refresh editor window */
+	{V_KEY_NL, v_insert_nl},	/*  10, Insert newline */
+	{V_KEY_RET, v_insert_nl},	/*  13, Insert newline */
+	{V_KEY_ESC, v_switch_cmd},	/*  27, Switch into Command Mode */
+	{V_KEY_BKSP, v_bksp},		/* 127, Left backspacing */
+	{KEY_BACKSPACE, v_bksp},	/* 263, Left backspacing */
 	{KEY_ENTER, v_insert_nl},	/* 343, Insert newline */
 	{0, NULL}			/* Sentinel */
 };

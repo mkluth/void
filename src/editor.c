@@ -118,7 +118,7 @@ retval:
 }
 
 /**
- * v_backspace - backspacing at the targeted v_state
+ * v_bksp - backspacing at the targeted v_state
  * v: Pointer to the targeted v_state struct.
  *
  * Backspace a character from a v_state's rows according to the current values
@@ -142,14 +142,14 @@ retval:
  * the cursor positioning is whenever using this function. V_ERR will be returns
  * otherwise.
  */
-int v_backspace(struct v_state *v)
+int v_bksp(struct v_state *v)
 {
 	if (!v || v->cur_y == v->nrows || (v->cur_x == 0 && v->cur_y == 0))
 		return V_ERR;
 
 	struct v_row *row = &v->rows[v->cur_y];
 	if (v->cur_x > 0)
-		goto left_backspace;
+		goto left_bksp;
 
 	v->cur_x = v->rows[v->cur_y - 1].len;
 	v_row_append_str(&v->rows[v->cur_y - 1], row->orig, row->len);
@@ -159,7 +159,7 @@ int v_backspace(struct v_state *v)
 
 	return v->cur_y;
 
-left_backspace:
+left_bksp:
 	if (v_row_del_char(row, v->cur_x - 1) == V_ERR)
 		return V_ERR;
 	v->cur_x--;
@@ -169,20 +169,20 @@ left_backspace:
 }
 
 /**
- * v_right_backspace - right backspacing at the targeted v_state
+ * v_right_bksp - right backspacing at the targeted v_state
  * v: Pointer to the targeted v_state struct.
  *
  * Right backspacing at the targeted v_state. Nothing complex here, simply move
- * the cursor to the right and backspace using v_backspace() function. v->dirty
- * flag will be setted to true automatically by v_backspace(). Value of the
+ * the cursor to the right and backspace using v_bksp() function. v->dirty
+ * flag will be setted to true automatically by v_bksp(). Value of the
  * cursor's x and y position will be updated.
  *
  * Returns V_OK on success, V_ERR otherwise.
  */
-int v_right_backspace(struct v_state *v)
+int v_right_bksp(struct v_state *v)
 {
 	v_cur_right(v);
-	if (v_backspace(v) == V_ERR)
+	if (v_bksp(v) == V_ERR)
 		return V_ERR;
 
 	return V_OK;

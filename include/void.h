@@ -138,8 +138,8 @@ int v_save(struct v_state *v);
 /* src/editor.c */
 int v_insert(struct v_state *v, int c);
 int v_insert_nl(struct v_state *v);
-int v_backspace(struct v_state *v);
-int v_right_backspace(struct v_state *v);
+int v_bksp(struct v_state *v);
+int v_right_bksp(struct v_state *v);
 
 /* src/row.c */
 int v_render_row(struct v_row *row);
