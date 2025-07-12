@@ -210,6 +210,16 @@ int v_rfsh_scr(struct v_state *v)
 	if (!v)
 		return V_ERR;
 
+	if (v_winch) {
+		endwin();
+		refresh();
+		clear();
+		v_winch = 0;
+	}
+
+	getmaxyx(stdscr, v->scr_y, v->scr_x);
+	v->scr_y -= 2;
+
 	v_scroll(v);
 	curs_set(0);
 	v_draw_scr_y(v);

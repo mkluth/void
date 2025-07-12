@@ -201,7 +201,10 @@ static int v_insert_input(struct v_state *v, int key)
 		if (insert_keys[i].key == key)
 			return insert_keys[i].func(v);
 
-	return v_insert(v, key);
+	if (key >= 0 && (isprint((unsigned char)key) || key == '\t'))
+		return v_insert(v, key);
+
+	return V_ERR;
 }
 
 /* === Input related functions === */

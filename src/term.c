@@ -13,10 +13,19 @@
  * It is licensed under MIT License. See the LICENSE file for details.
  */
 
+#include <signal.h>
 #include <ncurses.h>
 #include <stdbool.h>
 
 #include <void.h>
+
+volatile sig_atomic_t v_winch = 0;
+
+static void v_handle_winch(int sig)
+{
+	(void)sig;	/* Silence compiler warning */
+	v_winch = 1;
+}
 
 /**
  * v_init_term - initialize the specifed v_state terminal into curses mode
@@ -40,6 +49,8 @@ int v_init_term(struct v_state *v)
 
 	getmaxyx(stdscr, v->scr_y, v->scr_x);
 	v->scr_y -= 2;
+
+	signal(SIGWINCH, v_handle_winch);
 
 	return V_OK;
 }

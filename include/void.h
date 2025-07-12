@@ -13,6 +13,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <signal.h>
 
 #define V_VER		"0.0.1"
 #define V_DESC		"Built like Vim and GNU nano, but worse."
@@ -101,6 +102,8 @@ struct v_key {
 	int key;
 	int (*func)(struct v_state *v);
 };
+
+extern volatile sig_atomic_t v_winch;
 
 /* src/state.c */
 struct v_state *v_new_state(void);
