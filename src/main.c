@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <void.h>
 
@@ -31,6 +32,7 @@ static void usage(void)
 	fputs("Arguments:\n", stdout);
 	fputs("   --help\tDisplay this help and exit.\n", stdout);
 	fputs("   --version\tOutput version information and exit.\n", stdout);
+	fputs("   -n\t\tTurns off colors support.\n", stdout);
 
 	exit(EXIT_FAILURE);
 }
@@ -50,12 +52,27 @@ int main(int argc, char **argv)
 			version();
 	}
 
+	int opt;
 	struct v_state *v = v_new_state();
-	v_init_term(v);
-	v_init_colors(v);
+	while ((opt = getopt(argc, argv, "n")) != -1) {
+		switch (opt) {
+		case 'n':
+			/* Open without colors support */
+			v->colors = false;
+			break;
+		default:
+			/* Display help and exit */
+			v_dstr_state(v);
+			usage();
+		}
+	}
 
-	if (argc >= 2)
-		v_open(v, argv[1]);
+	v_init_term(v);
+	if (v->colors)
+		v_init_colors(v);
+
+	if (optind < argc)
+		v_open(v, argv[optind]);
 
 	while (v->run) {
 		v_rfsh_scr(v);

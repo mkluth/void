@@ -41,7 +41,7 @@ struct v_state *v_new_state(void)
 	v->rcur_x = 0;
 	v->rowoff = 0;
 	v->coloff = 0;
-	v->colors = false;
+	v->colors = true;
 	v->filename = NULL;
 	memset(v->stats_msg, 0, sizeof(v->stats_msg));
 	v->dirty = false;
