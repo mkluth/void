@@ -30,9 +30,9 @@ static void usage(void)
 	fputs("Usage: void [arguments] [file]\tEdit specified file.\n\n",
 	     stdout);
 	fputs("Arguments:\n", stdout);
-	fputs("   --help\tDisplay this help and exit.\n", stdout);
-	fputs("   --version\tOutput version information and exit.\n", stdout);
-	fputs("   -n\t\tTurns off colors support.\n", stdout);
+	fputs("   -h\tDisplay this help and exit.\n", stdout);
+	fputs("   -v\tOutput version information and exit.\n", stdout);
+	fputs("   -n\tTurns off colors support.\n", stdout);
 
 	exit(EXIT_FAILURE);
 }
@@ -45,17 +45,16 @@ static void version(void)
 
 int main(int argc, char **argv)
 {
-	if (argc == 2) {
-		if (strcmp(argv[1], "--help") == 0)
-			usage();
-		if (strcmp(argv[1], "--version") == 0)
-			version();
-	}
-
 	int opt;
 	struct v_state *v = v_new_state();
-	while ((opt = getopt(argc, argv, "n")) != -1) {
+	while ((opt = getopt(argc, argv, "hvn")) != -1) {
 		switch (opt) {
+		case 'h':
+			usage();
+			break;
+		case 'v':
+			version();
+			break;
 		case 'n':
 			/* Open without colors support */
 			v->colors = false;
