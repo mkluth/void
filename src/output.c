@@ -75,15 +75,6 @@ tildes:
 	printw("~\n");
 }
 
-static void v_draw_scr_y(struct v_state *v)
-{
-	for (int y = 0; y < v->scr_y; y++) {
-		move(y, 0);
-		v_draw_y(v, y);
-		clrtoeol();
-	}
-}
-
 static int v_draw_bar(struct v_state *v)
 {
 	move(v->scr_y, 0);
@@ -117,7 +108,7 @@ static int v_draw_bar(struct v_state *v)
 	if (v->colors)
 		attroff(A_BOLD | COLOR_PAIR(V_BAR));
 
-	printw("\r\n");
+	printw("\n");
 
 	return V_OK;
 }
@@ -186,12 +177,12 @@ int v_set_stats_msg(struct v_state *v, const char *fmt, ...)
 
 static void v_draw_msg_bar(struct v_state *v)
 {
+	move(v->scr_y + 1, 0);
 	clrtoeol();
-	int msg_len =  strlen(v->stats_msg);
 
+	int msg_len =  strlen(v->stats_msg);
 	if (msg_len > v->scr_x)
 		msg_len = v->scr_x;
-
 	if (msg_len)
 		addnstr(v->stats_msg, msg_len);
 }
@@ -201,7 +192,8 @@ static void v_draw_msg_bar(struct v_state *v)
  * v: Pointer to the targeted v_state struct.
  *
  * Refresh the editor screen using the specified v_state. Please take note that
- * this function only works in curses mode.
+ * this function only works in curses mode and also responsive to SIGWINCH
+ * signal.
  *
  * Returns V_OK on success, V_ERR otherwise.
  */
@@ -222,7 +214,13 @@ int v_rfsh_scr(struct v_state *v)
 
 	v_scroll(v);
 	curs_set(0);
-	v_draw_scr_y(v);
+
+	for (int y = 0; y < v->scr_y; y++) {
+		move(y, 0);
+		v_draw_y(v, y);
+		clrtoeol();
+	}
+
 	v_draw_bar(v);
 	v_draw_msg_bar(v);
 	move(v->cur_y - v->rowoff, v->rcur_x - v->coloff);
