@@ -54,7 +54,7 @@ int v_insert(struct v_state *v, int c)
 		if (v_insert_row(v, v->nrows, "", 0) == V_ERR)
 			return V_ERR;
 
-	if (v_row_insert_char(&v->rows[v->cur_y], v->cur_x, c) == V_ERR)
+	if (v_row_insert_char(v, &v->rows[v->cur_y], v->cur_x, c) == V_ERR)
 		return V_ERR;
 
 	v->cur_x++;
@@ -105,7 +105,7 @@ int v_insert_nl(struct v_state *v)
 	row = &v->rows[v->cur_y];
 	row->len = v->cur_x;
 	row->orig[row->len] = '\0';
-	stats = v_render_row(row);
+	stats = v_render_row(v, row);
 	if (stats == V_ERR)
 		return V_ERR;
 
@@ -152,7 +152,7 @@ int v_bksp(struct v_state *v)
 		goto left_bksp;
 
 	v->cur_x = v->rows[v->cur_y - 1].len;
-	v_row_append_str(&v->rows[v->cur_y - 1], row->orig, row->len);
+	v_row_append_str(v, &v->rows[v->cur_y - 1], row->orig, row->len);
 	v_del_row(v, v->cur_y);
 	v->cur_y--;
 	v->dirty = true;
@@ -160,7 +160,7 @@ int v_bksp(struct v_state *v)
 	return v->cur_y;
 
 left_bksp:
-	if (v_row_del_char(row, v->cur_x - 1) == V_ERR)
+	if (v_row_del_char(v, row, v->cur_x - 1) == V_ERR)
 		return V_ERR;
 	v->cur_x--;
 	v->dirty = true;

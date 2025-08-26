@@ -50,9 +50,11 @@ int main(int argc, char **argv)
 	while ((opt = getopt(argc, argv, "hvn")) != -1) {
 		switch (opt) {
 		case 'h':
+			v_dstr_state(v);
 			usage();
 			break;
 		case 'v':
+			v_dstr_state(v);
 			version();
 			break;
 		case 'n':

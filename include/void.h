@@ -145,12 +145,12 @@ int v_bksp(struct v_state *v);
 int v_right_bksp(struct v_state *v);
 
 /* src/row.c */
-int v_render_row(struct v_row *row);
+int v_render_row(struct v_state *v, struct v_row *row);
 int v_insert_row(struct v_state *v, int y, char *s, size_t len);
 int v_del_row(struct v_state *v, int y);
 int v_free_rows(struct v_state *v);
-int v_row_insert_char(struct v_row *row, int at, int c);
-int v_row_append_str(struct v_row *row, char *s, size_t len);
-int v_row_del_char(struct v_row *row, int x);
+int v_row_insert_char(struct v_state *v, struct v_row *row, int at, int c);
+int v_row_append_str(struct v_state *v, struct v_row *row, char *s, size_t len);
+int v_row_del_char(struct v_state *v, struct v_row *row, int x);
 
 #endif	/* VOID_H */

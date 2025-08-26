@@ -27,6 +27,7 @@
 
 /**
  * v_render_row - render the given v_row struct
+ * v: Pointer to the targeted v_state struct.
  * row: Pointer to the targeted v_row struct.
  *
  * Render the given v_row struct. This function renders the content of the
@@ -35,16 +36,18 @@
  * value of V_TABSTP macro, a tab character will be rendered to match the
  * value of it. The rendered string result will be saved inside row->ren
  * meanwhile the length of the rendered string will be saved inside row->rlen.
+ * Dirty flag will be setted to true.
  *
  * Returns V_OK on success, V_ERR otherwise.
  */
-int v_render_row(struct v_row *row)
+int v_render_row(struct v_state *v, struct v_row *row)
 {
 	int tabs = 0;
 	for (int i = 0; i < row->len; i++)
 		if (row->orig[i] == '\t')
 			tabs++;
 	free(row->ren);
+	v->dirty = true;
 	row->ren = malloc(row->len + tabs * (V_TABSTP - 1) + 1);
 	if (!row->ren)
 		return V_ERR;
@@ -102,6 +105,7 @@ int v_insert_row(struct v_state *v, int y, char *s, size_t len)
 
 	struct v_row *row = &v->rows[y];
 	row->len = len;
+	v->dirty = true;
 	row->orig = malloc(len + 1);
 	if (!row->orig)
 		return V_ERR;
@@ -110,12 +114,11 @@ int v_insert_row(struct v_state *v, int y, char *s, size_t len)
 	row->orig[len] = '\0';
 	row->ren = NULL;
 	row->rlen = 0;
-	if (v_render_row(row) == V_ERR)
+	if (v_render_row(v, row) == V_ERR)
 		return V_ERR;
 
 	v->nrows++;
 	row = NULL;
-	v->dirty = true;
 
 	return v->nrows;
 }
@@ -195,6 +198,7 @@ int v_free_rows(struct v_state *v)
 
 /**
  * v_row_insert_char - insert a char into a v_row at the given position
+ * v: Pointer to the targeted v_state struct.
  * row: Pointer to the targeted v_row struct.
  * x: The index to insert the char into.
  * c: Char to be inserted with.
@@ -204,11 +208,11 @@ int v_free_rows(struct v_state *v)
  * the insertion is carried out. All of the characters within the original
  * string will be moved to create a room for the new character insertion.
  * The original string then will be rendered automatically. Please take note
- * that this function will *not* turn on the editor dirty flag.
+ * that this function will turn on the editor dirty flag.
  *
  * Returns newly updated number of row->len on success, V_ERR otherwise.
  */
-int v_row_insert_char(struct v_row *row, int x, int c)
+int v_row_insert_char(struct v_state *v, struct v_row *row, int x, int c)
 {
 	if (x < 0 || x > row->len)
 		x = row->len;
@@ -221,13 +225,15 @@ int v_row_insert_char(struct v_row *row, int x, int c)
 	memmove(&row->orig[x + 1], &row->orig[x], row->len - x + 1);
 	row->len++;
 	row->orig[x] = c;
-	v_render_row(row);
+	v->dirty = true;
+	v_render_row(v, row);
 
 	return row->len;
 }
 
 /**
  * v_row_append_str - append a string to the end of a v_row struct string
+ * v: Pointer to the targeted v_state struct.
  * row: Pointer to the targeted v_row struct.
  * s: String to appended with.
  * len: The length of string s.
@@ -238,12 +244,12 @@ int v_row_insert_char(struct v_row *row, int x, int c)
  * common use case of this function, feel free to use it whenever needed. In
  * the end this function simply append the string s to the specified v_row's
  * original string before rendering them and that's all it does. Please take
- * note that this function will *not* turn on the editor dirty flag.
+ * note that this function will turn on the editor dirty flag.
  *
  * Returns the new length of the original updated string on success, V_ERR
  * otherwise.
  */
-int v_row_append_str(struct v_row *row, char *s, size_t len)
+int v_row_append_str(struct v_state *v, struct v_row *row, char *s, size_t len)
 {
 	if (!row || !s)
 		return V_ERR;
@@ -256,8 +262,9 @@ int v_row_append_str(struct v_row *row, char *s, size_t len)
 	memcpy(&row->orig[row->len], s, len);
 	row->len += len;
 	row->orig[row->len] = '\0';
+	v->dirty = true;
 
-	if (v_render_row(row) == V_ERR)
+	if (v_render_row(v, row) == V_ERR)
 		return V_ERR;
 
 	return row->len;
@@ -265,6 +272,7 @@ int v_row_append_str(struct v_row *row, char *s, size_t len)
 
 /**
  * v_row_del_char - delete a char inside the specified v_row at a given position
+ * v: Pointer to the targeted v_state struct.
  * row: Pointer to the targeted v_row struct.
  * x: Index to delete the char from.
  *
@@ -272,18 +280,19 @@ int v_row_append_str(struct v_row *row, char *s, size_t len)
  * technically delete the char actually. We simply just move the entire string
  * so that it overlaps that one character we wanted to delete out. Then, we
  * simply decrement the original string length and re-render it. Again, please
- * take note that this function will not *turn* on the editor dirty flag.
+ * take note that this function will *turn* on the editor dirty flag.
  *
  * Returns the newly updated value of row->len on success, V_ERR otherwise.
  */
-int v_row_del_char(struct v_row *row, int x)
+int v_row_del_char(struct v_state *v, struct v_row *row, int x)
 {
 	if (x < 0 || x >= row->len)
 		return V_ERR;
 
 	memmove(&row->orig[x], &row->orig[x + 1], row->len - x);
 	row->len--;
-	v_render_row(row);
+	v->dirty = true;
+	v_render_row(v, row);
 
 	return row->len;
 }
